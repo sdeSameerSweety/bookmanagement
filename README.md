@@ -7,10 +7,10 @@
 - This time each group should have a *single git branch*. Coordinate amongst yourselves by ensuring every next person pulls the code last pushed by a team mate. You branch will be checked as part of the demo. Branch name should follow the naming convention `project/booksManagementGroupX`
 - Follow the naming conventions exactly as instructed.
 
-### Models
+### Models 
 - User Model
 ```yaml
-{ 
+{ //trim:true
   title: {string, mandatory, enum[Mr, Mrs, Miss]},
   name: {string, mandatory},
   phone: {string, mandatory, unique},
@@ -19,7 +19,7 @@
   address: {
     street: {string},
     city: {string},
-    pincode: {string}
+    pincode: {string}//length must be 6
   },
   createdAt: {timestamp},
   updatedAt: {timestamp}
