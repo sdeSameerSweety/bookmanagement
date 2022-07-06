@@ -1,7 +1,7 @@
 const userModel = require('../models/userModel')
 
 const jwt=require('jsonwebtoken')
-const{isValidEmail,isValid,isEmpty}=require('../middleware/validation')
+const{isValidEmail,isValid,isEmpty,isVerifyString,validateMobile}=require('../middleware/validation')
 
 
 const createUser = async function (req , res) {
@@ -12,7 +12,7 @@ const createUser = async function (req , res) {
         const {title,name,phone,email,password,address} = data
 
         // checking if request body is empty
-        if(Object.keys(data).length == 0) {res.status(400).send({status:false, msg:"Enter the Author details"})}
+        if(Object.keys(data).length == 0) {return res.status(400).send({status:false, msg:"Enter the Author details"})}
 
         // checking if requireq fields is provided in request body
         if (!title) { return res.status(400).send({ status: false, msg: "title is required" }) }
@@ -20,8 +20,64 @@ const createUser = async function (req , res) {
         if (!phone) { return res.status(400).send({ status: false, msg: "phone is required" }) }
         if (!password) { return res.status(400).send({ status: false, msg: "password is required" }) }
         if (!email) { return res.status(400).send({ status: false, msg: "email is required" }) }
-
         if (!address) { return res.status(400).send({ status: false, msg: "address is required" }) }
+       
+        if (!isValid(title)) {
+            return res.status(400).send({ status: false, message: "Title must be present" })
+        };
+        const isValidTitle = function(title) {
+            return ['Mr', 'Mrs', 'Miss'].indexOf(title) !== -1
+        }
+        if (!isValidTitle(title)) {
+            return res.status(400).send({ status: false, message: `Title should be among Mr, Mrs or Miss` })
+        }
+        if (!isValid(name)) {
+            return res.status(400).send({ status: false, message: "name must be present" })
+        };
+        if (!isEmpty(name)) {
+            return res.status(400).send({status:false, message:"please provide a valid name"})
+        }
+        if (typeof name == 'number'){
+            return res.status(400).send({status:false, message: "provide a valid name"})
+        }
+        if (isVerifyString(name)) {
+            return res.status(400).send({status:false, message: "name can't contain number"})
+        } 
+        if (!isValid(phone)) {
+            return res.status(400).send({ status: false, message: "phone must be present" })
+        };
+       
+        //validation for mobile number length and unique number
+    
+        if(!validateMobile(data.phone.trim())) return res.status(400).send({status:false, message:"mobile can't contain albhabets"})
+        if(data.phone.length!=10){
+            return res.status(400).send({status:false,message:"Number should be of 10 digits"})
+        }
+        if(await userModel.findOne({phone:data.phone})){
+            return res.status(400).send({status:false, message:"PhoneNumber already exists. Please give another one"})
+        }
+
+        if (!isValid(password)) {
+            return res.status(400).send({ status: false, message: "password must be present" })
+        };
+        if (!isValid(email)) {
+            return res.status(400).send({ status: false, message: "email must be present" })
+        };
+        if (!isValidEmail(email)) {
+            return res.status(400).send({status:false, message: "please provide a valid email"})
+        }
+        
+        if(await userModel.findOne({email:data.email})){
+            return res.status(400).send({status:false, message:"Email already exists. Please give another one"})
+        }
+        if (!isValid(address)) {
+            return res.status(400).send({ status: false, message: "address must be present" })
+        };
+        if (address.pincode.length != 6) {
+            return res.status(400).send({status:false,message:"Pincode should be of 6 digits"})
+
+        }
+       
 
         
         //saving user data into DB.
@@ -90,40 +146,3 @@ module.exports.loginUser = loginUser
 
 
 
-// const{validateEmail,isEmpty,isValid}=require('../middleware/validation')
-// const userModel=require('../models/userModel')
-// let loginUser=async function(req,res){
-//     try {
-    //     const data=req.body
-    //    const email=data.email
-    //    const password=data.password
-
-    //     if(Object.keys(data).length==0)return res.status(400).send({ status: false, msg: "Body can not be empty " })
-    //     if(!(email in data))
-    //     if(!(password in data))
-    //     if(isValid(email))
-    //     if(isValid(password))
-    //     if(isEmpty(email))
-    //     if(isEmpty(password))
-    //     if(!validateEmail(email))return res.status(400).send({status:false,msg:"please enter valid email"})
-
-    //     //finding user in DB
-    //   let findEmail=await  userModel.findOne({email:email}) 
-    //   if(!findEmail)return res.status(404).send({status:false,msg:"User not found"})
-    //   //if password is wrong
-    //   if((findEmail.password!=password)) return res.status(401).send({status:false,msg:"invalid password"})
-
-//         let token=jwt.sign(
-//             {
-//                 id: findEmail._id.toString(),
-//               },
-//               "Book Management Project@#$%, team No.= 62"
-//         )
-//         res.setHeader(("x-api-key", jwt))
-//         res.status(200).send({status:true, token:token})
-
-//     } catch (error) {
-//         res.status(500).send({ msg: error.message });
-//     }
-// }
-// module.exports.loginUser=loginUser

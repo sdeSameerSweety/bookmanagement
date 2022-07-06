@@ -12,4 +12,19 @@ const isValidEmail=(mail)=>{
     return true
 }
 
-module.exports={isValidEmail,isEmpty,isValid}
+
+const isVerifyString = function (string) {
+    return regex.test(string)
+}
+
+const validateMobile = function(number) {
+    if(/^[0-9]+$/.test(number)) return true
+}
+
+// if(/^[1-9][0-9]{5}$/.test(pin))
+
+module.exports={isValidEmail,isEmpty,isValid,isVerifyString,validateMobile}
+
+
+
+
