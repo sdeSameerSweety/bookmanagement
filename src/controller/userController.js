@@ -1,7 +1,7 @@
 const userModel = require('../models/userModel')
 
 const jwt=require('jsonwebtoken')
-const{validateEmail}=require('../middleware/validation')
+const{isValidEmail,isValid,isEmpty}=require('../middleware/validation')
 
 
 const createUser = async function (req , res) {
@@ -34,25 +34,96 @@ const createUser = async function (req , res) {
 }
 
 
+let loginUser=async function(req,res){
+    try {
+        const data=req.body
+        const email=data.email
+        const password=data.password
+            if(Object.keys(data).length==0)return res.status(400).send({ status: false, msg: "Body can not be empty " });
+            if(!("email" in data)) return res.status(400).send({ status: false, msg: "email is required " });
+            if(!("password" in data)) return res.status(400).send({ status: false, msg: "password is required " })
+            if(!isEmpty(email)) return res.status(400).send({ status: false, msg: "email can not be empty and must be string" })
+            if(!isEmpty(password))return res.status(400).send({ status: false, msg: "password can not be empty and must be string" })
+            if(!isValid(email)) return res.status(400).send({ status: false, msg: "email can not be null and undefined" })
+            if(!isValid(password)) return res.status(400).send({ status: false, msg: "password can not be null or undefined" })
+            if(!isValidEmail(email))return res.status(400).send({status:false,msg:"please enter valid email"})
+    
+         //   finding user in DB
+             let findEmail=await  userModel.findOne({email:email}) 
+             if(!findEmail)return res.status(404).send({status:false,msg:"User not found"})
+         //   if password is wrong
+             if((findEmail.password!=password)) return res.status(401).send({status:false,msg:"invalid password"})
+        //generate JWT
+             let token=jwt.sign(
+             {
+                id: findEmail._id.toString(),
+                iat:Math.floor(new Date().getTime()/1000),
+              },
+              "Book Management Project@#$%, team No.= 62",{expiresIn:"1h"});
+        res.setHeader("x-api-key", token);
+        res.status(200).send({status:true, token:token})
+        
+
+    } catch (error) {
+        res.status(500).send({ msg: error.message });
+    }
+}
+
+module.exports.createUser = createUser
+module.exports.loginUser = loginUser
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// const{validateEmail,isEmpty,isValid}=require('../middleware/validation')
+// const userModel=require('../models/userModel')
 // let loginUser=async function(req,res){
 //     try {
-//         const data=req.body
-//         const {email,password}=data
+    //     const data=req.body
+    //    const email=data.email
+    //    const password=data.password
 
+    //     if(Object.keys(data).length==0)return res.status(400).send({ status: false, msg: "Body can not be empty " })
+    //     if(!(email in data))
+    //     if(!(password in data))
+    //     if(isValid(email))
+    //     if(isValid(password))
+    //     if(isEmpty(email))
+    //     if(isEmpty(password))
+    //     if(!validateEmail(email))return res.status(400).send({status:false,msg:"please enter valid email"})
 
+    //     //finding user in DB
+    //   let findEmail=await  userModel.findOne({email:email}) 
+    //   if(!findEmail)return res.status(404).send({status:false,msg:"User not found"})
+    //   //if password is wrong
+    //   if((findEmail.password!=password)) return res.status(401).send({status:false,msg:"invalid password"})
 
-//         let jwt=jwt.sign(
+//         let token=jwt.sign(
 //             {
-//                 id: validateEmail._id.toString(),
+//                 id: findEmail._id.toString(),
 //               },
 //               "Book Management Project@#$%, team No.= 62"
 //         )
-        
-        
+//         res.setHeader(("x-api-key", jwt))
+//         res.status(200).send({status:true, token:token})
 
 //     } catch (error) {
-        
+//         res.status(500).send({ msg: error.message });
 //     }
 // }
-
-module.exports.createUser = createUser
+// module.exports.loginUser=loginUser
