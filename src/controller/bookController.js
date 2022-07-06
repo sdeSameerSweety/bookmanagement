@@ -1,6 +1,8 @@
 //Sandip
 const bookModel = require('../models/bookModel')
 
+const{isEmpty,isValidString,isValidISBN}=require('../middleware/validation')
+
 const createBook = async function (req, res) {
 
     try {
@@ -21,6 +23,19 @@ const createBook = async function (req, res) {
 
         // checking if requireq fields is empty in request body
         if(!isEmpty(title)) return res.status(400).send({ status: false, msg: "Please enter Title" })
+        if (!isValidString(title)) return res.status(400).send({ status: false, message: "Title is not valid" })
+
+        if (!isEmpty(excerpt)) { return res.status(400).send({ status: false, msg: "excerpt is required" }) }
+        if (!isValidString(excerpt)) return res.status(400).send({ status: false, message: "excerpt is not valid" })
+
+        if (!isEmpty(ISBN)) { return res.status(400).send({ status: false, msg: "ISBN is required" }) }
+        if (!isValidISBN(ISBN)) { return res.status(400).send({ status: false, msg: "ISBN is not valid" }) }
+
+        if (!isEmpty(category)) { return res.status(400).send({ status: false, msg: "category is required" }) }
+
+        if (!isEmpty(subcategory)) { return res.status(400).send({ status: false, msg: "subcategory is required" }) }
+        
+        //if(isVerifyString(title)) return res.status(400).send({ status: false, msg: "Title is Invalid" })
         
 
         let bookData = await bookModel.create(data);
