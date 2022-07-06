@@ -12,4 +12,27 @@ const isValidEmail=(mail)=>{
     return true
 }
 
-module.exports={isValidEmail,isEmpty,isValid}
+
+const isVerifyString = function (string) {
+    return regex.test(string)
+}
+
+const validateMobile = function(number) {
+    if(/^[0-9]+$/.test(number)) return true
+}
+
+const isValidString = function(string) {
+    if(/^([a-zA-Z. , ]){1,100}$/.test(string)) return true
+}
+
+const isValidISBN = function(ISBN) {
+    if(/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/.test(ISBN)) return true
+}
+
+// if(/^[1-9][0-9]{5}$/.test(pin))
+
+module.exports={isValidEmail,isEmpty,isValid,isVerifyString,validateMobile,isValidString,isValidISBN}
+
+
+
+
