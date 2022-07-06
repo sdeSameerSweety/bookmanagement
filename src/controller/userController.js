@@ -1,5 +1,8 @@
 const userModel = require('../models/userModel')
 
+const jwt=require('jsonwebtoken')
+const{validateEmail}=require('../middleware/validation')
+
 
 const createUser = async function (req , res) {
     try {
@@ -9,7 +12,7 @@ const createUser = async function (req , res) {
         const {title,name,phone,email,password,address} = data
 
         // checking if request body is empty
-        if(Object.keys(author).length == 0) {res.status(400).send({status:false, msg:"Enter the Author details"})}
+        if(Object.keys(data).length == 0) {res.status(400).send({status:false, msg:"Enter the Author details"})}
 
         // checking if requireq fields is provided in request body
         if (!title) { return res.status(400).send({ status: false, msg: "title is required" }) }
@@ -29,5 +32,27 @@ const createUser = async function (req , res) {
     catch(err) { return res.status(500).send({ status: false, message: "Something went wrong", Error: err.message})}
 
 }
+
+
+// let loginUser=async function(req,res){
+//     try {
+//         const data=req.body
+//         const {email,password}=data
+
+
+
+//         let jwt=jwt.sign(
+//             {
+//                 id: validateEmail._id.toString(),
+//               },
+//               "Book Management Project@#$%, team No.= 62"
+//         )
+        
+        
+
+//     } catch (error) {
+        
+//     }
+// }
 
 module.exports.createUser = createUser
