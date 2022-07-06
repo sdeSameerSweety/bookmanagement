@@ -14,6 +14,8 @@ router.post('/register',userController.createUser)
 //......................Login User....................................//
 router.post('/login',userController.loginUser)
 
+//......................Get Book By Query....................................//
+// router.get('/books/:bookId',bookController.getBookByQuery)
 
 
 module.exports = router;
