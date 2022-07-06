@@ -1,5 +1,6 @@
 //Sandip
 const mongoose = require('mongoose')
+var moment = require('moment');
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const bookSchema = new mongoose.Schema({
@@ -42,8 +43,7 @@ const bookSchema = new mongoose.Schema({
     },
 
     releasedAt: {
-        type: Date,
-        default:Date.now(),
+        type: String,
         required: true  // format("YYYY-MM-DD")
     },
 
