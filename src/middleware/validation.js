@@ -12,4 +12,9 @@ const isValidEmail=(mail)=>{
     return true
 }
 
+
+
+
+
+
 module.exports={isValidEmail,isEmpty,isValid}
