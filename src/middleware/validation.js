@@ -13,7 +13,6 @@ const isValidEmail=(mail)=>{
 }
 
 
-const regex = /\d/;
 const isVerifyString = function (string) {
     return regex.test(string)
 }
@@ -25,3 +24,7 @@ const validateMobile = function(number) {
 // if(/^[1-9][0-9]{5}$/.test(pin))
 
 module.exports={isValidEmail,isEmpty,isValid,isVerifyString,validateMobile}
+
+
+
+
