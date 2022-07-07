@@ -42,8 +42,7 @@ const bookSchema = new mongoose.Schema({
     },
 
     releasedAt: {
-        type: Date,
-        default:Date.now(),
+        type: String,
         required: true  // format("YYYY-MM-DD")
     },
 

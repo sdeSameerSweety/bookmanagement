@@ -40,9 +40,9 @@ const createUser = async function (req , res) {
         if (typeof name == 'number'){
             return res.status(400).send({status:false, message: "provide a valid name"})
         }
-        if (isVerifyString(name)) {
-            return res.status(400).send({status:false, message: "name can't contain number"})
-        } 
+        // if (isVerifyString(name)) {
+        //     return res.status(400).send({status:false, message: "name can't contain number"})
+        // } 
         if (!isValid(phone)) {
             return res.status(400).send({ status: false, message: "phone must be present" })
         };
