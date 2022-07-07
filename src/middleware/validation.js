@@ -30,13 +30,20 @@ const validPasward = function checkPassword(password)
     return re.test(password);
 }
 
-//^[0-9]+$/
-//^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[789]\d{9}$
-//^[0-9]+$
-//r'^(+91[-\s]?)?[0]?(91)?[789]\d{9}$'
-// if(/^[1-9][0-9]{5}$/.test(pin))
+
 
 module.exports={isValidEmail,isEmpty,isValid,isVerifyString,validateMobile,validPasward}
+const isValidString = function(string) {
+    if(/^([a-zA-Z. , ]){1,100}$/.test(string)) return true
+}
+
+const isValidISBN = function(ISBN) {
+    if(/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/.test(ISBN)) return true
+}
+
+
+
+module.exports={isValidEmail,isEmpty,isValid,isVerifyString,validateMobile,isValidString,isValidISBN}
 
 
 
