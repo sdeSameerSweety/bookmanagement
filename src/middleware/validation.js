@@ -8,18 +8,20 @@ const isEmpty = function (value) {
     return true
 }
 const isValidEmail = (mail) => {
-    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail))
+    let  trimEmail=mail.trim()
+    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(trimEmail))
         return true
 }
 
 const regex = /\d/;
 const isVerifyString = function (string) {
-    return regex.test(string)
+    let   trimString=string.trim()
+    return regex.test(trimString)
 } 
-
 
 const isValidString = function (string) {
     if (/^([a-zA-Z. , ]){1,100}$/.test(string)) return true}
+
 
 const validateMobile = function(number) {
     let trim = number.trim()
@@ -44,7 +46,8 @@ const isValidISBN = function (ISBN) {
 
 
 const isValidDate = function (Date) {
-    if (/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(Date)) return true
+    let trimDate=Date.trim()
+    if (/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(trimDate)) return true
 }
 
 

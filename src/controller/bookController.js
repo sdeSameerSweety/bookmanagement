@@ -4,6 +4,8 @@ const bookModel = require('../models/bookModel')
 const reviewModel = require('../models/reviewModel')
 const mongoose=require('mongoose')
 const { isEmpty, isValidISBN, isVerifyString, isValidDate } = require('../middleware/validation')
+const userModel = require("../models/userModel")
+const { findOneAndUpdate } = require("../models/userModel")
 
 const createBook = async function (req, res) {
 
@@ -29,7 +31,7 @@ const createBook = async function (req, res) {
         if (!isEmpty(excerpt)) { return res.status(400).send({ status: false, msg: "excerpt is required" }) }
 
         let userID = data.userId
-        let checkUserId = await bookModel.findOne({ userId: userID })
+        let checkUserId = await userModel.findOne({ userId: userID })
         if (!checkUserId)
             return res.status(400).send({ status: false, msg: "userId don't Exist" })
 
@@ -100,7 +102,7 @@ const getBooks = async function (req, res) {
     catch (err) {
         res.status(500).send({ status: false, msg: err.message })
     }
-}
+} 
 
 // ### GET /books/:bookId
 let getBookByID=async function(req,res){
@@ -114,7 +116,7 @@ let getBookByID=async function(req,res){
         let findReview=await reviewModel.find({bookId:data})
         ReviewCount=findReview.length
         console.log(ReviewCount)
-        findBook.reviews=ReviewCount
+        findBook.reviews=ReviewCount  
         findBook['reviewsData']=findReview
         return res.status(200).send({status:true,message:'Books list',Data:findBook})
     } catch (error) {
@@ -127,6 +129,7 @@ const deleteBooks = async function (req, res) {
         let book = req.params.bookId
         console.log(book)
         const check = await bookModel.findById(book)
+        
         if(check.isDeleted==true) return res.status(200).send({ status: false, msg: "data is already deleted" })
         let DeletedBook = await bookModel.findByIdAndUpdate(  { _id: book }, {$set: { isDeleted: true }}, {new: true})
         return res.status(200).send({ status: true, data: DeletedBook })
@@ -137,9 +140,57 @@ const deleteBooks = async function (req, res) {
     }
 
 
-}
+};
+
+let updateBook=async function (req,res){
+    try {
+        let data=req.body
+        let book=req.params.bookId 
+        const findBook = await bookModel.findOne({_id:book,isDeleted:false}).lean()
+        if(!findBook) return res.status(404).send({ status: false, msg:"No book found"  })
+
+        let temp={};
+    
+        if(data.title){
+            trimTitle=data.title.trim()
+            findBook.title=trimTitle
+            const checkTitle = await bookModel.findOne({title:trimTitle})
+            if(checkTitle)return res.status(400).send({status:false,msg:"this title:"+trimTitle +" "+"already present in database"})
+            temp["title"]=trimTitle
+        }
+        if(data.excerpt){
+            trimExcerpt=data.excerpt.trim()
+            findBook.excerpt=data.excerpt
+            temp["excerpt"]=data.excerpt
+        }
+        if(data.ISBN){
+            trimISBN=data.ISBN.trim()
+            findBook.ISBN=trimISBN
+           if( !isValidISBN(trimISBN))return res.status(400).send({status:false,msg:" Enter valid ISBN "})
+            const checkISBN = await bookModel.findOne({ISBN:trimISBN})
+            if(checkISBN)return res.status(400).send({status:false,msg:"this ISBN:"+trimISBN +" "+"already present in database"})
+            temp["ISBN"]=trimISBN
+        }
+         if(data.releasedAt){
+            trimReleasedAt=data.releasedAt.trim()
+           if(! isValidDate(trimReleasedAt))return res.status(400).send({status:false,msg:"Enter valid date (YYYY-MM-DD) "})
+            findBook.releasedAt=trimReleasedAt
+            temp["releasedAt"]=trimReleasedAt
+         }
+
+        let update=await bookModel.findOneAndUpdate({_id:book},{$set:temp},{new:true})
+        return res.status(200).send({status:true,msg:"success",data:update})
+        
+    } catch (error) {
+        console.log(error.message)
+        res.status(500).send({ status: false, msg: error.message })
+    }
+} 
+
+
 
 module.exports.createBook = createBook;
 module.exports.getBooks = getBooks
 module.exports.deleteBooks=deleteBooks
 module.exports.getBookByID=getBookByID
+module.exports.updateBook=updateBook
