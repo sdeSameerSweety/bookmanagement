@@ -22,6 +22,9 @@ router.get('/books',authenticate, bookController.getBooks)
 
 router.post('/login',userController.loginUser)
 
+//....................in case of invalid URL.....(static route)...../
+router.get('*',function (req,res){res.status(404).send({msg:"this page does not exist"})})
+
 //......................Get Book By Query....................................//
 // router.get('/books/:bookId',bookController.getBookByQuery)
 
