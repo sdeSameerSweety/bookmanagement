@@ -2,11 +2,13 @@ const express=require('express');
 const router=express.Router();
 const userController=require('../controller/userController')
 const bookController=require('../controller/bookController');
-const { authenticate } = require('../middleware/commonMW');
+const { authenticate,authorise } = require('../middleware/commonMW');
 const reviewController=require('../controller/reviewController')
 
 
 
+
+// const reviewController=require('../controller/reviewController')
 //......................Create User....................................//
 router.post('/register',userController.createUser)
 
@@ -16,7 +18,8 @@ router.post('/register',userController.createUser)
 router.post('/login',userController.loginUser) //done
 router.post('/books',authenticate, bookController.createBook)
 router.get('/books',authenticate, bookController.getBooks)//done
- 
+
+router.delete('/books/:bookId',authenticate,authorise, bookController.deleteBooks)
 
 
 //......................Get Book By ID....................................//
