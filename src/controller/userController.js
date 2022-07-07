@@ -85,7 +85,9 @@ const createUser = async function (req , res) {
         return res.status(201).send({ status: true, message: "Successfully saved User data", data: userData })
 
     }
-    catch(err) { return res.status(500).send({ status: false, message: "Something went wrong", Error: err.message})}
+    catch(err) {
+        console.log(err)
+        return res.status(500).send({ status: false, message: "Something went wrong", Error: err.message})}
 
 }
 
@@ -104,20 +106,21 @@ let loginUser=async function(req,res){
             if(!isValid(password)) return res.status(400).send({ status: false, msg: "password can not be null or undefined" })
             if(!isValidEmail(email))return res.status(400).send({status:false,msg:"please enter valid email"})
     
-         //   finding user in DB
-             let findEmail=await  userModel.findOne({email:email}) 
-             if(!findEmail)return res.status(404).send({status:false,msg:"User not found"})
-         //   if password is wrong
-             if((findEmail.password!=password)) return res.status(401).send({status:false,msg:"invalid password"})
-        //generate JWT
-             let token=jwt.sign(
-             {
+             //   finding user in DB
+            let findEmail=await  userModel.findOne({email:email}) 
+            if(!findEmail)return res.status(404).send({status:false,msg:"User not found"})
+            
+            //   if password is wrong
+            if((findEmail.password!=password)) return res.status(401).send({status:false,msg:"invalid password"})
+            
+            //generate JWT
+             let token=jwt.sign({
                 id: findEmail._id.toString(),
-                iat:Math.floor(new Date().getTime()/1000),
-              },
-              "Book Management Project@#$%, team No.= 62",{expiresIn:"1h"});
-        res.setHeader("x-api-key", token);
-        res.status(200).send({status:true, token:token})
+                iat:Math.floor(new Date().getTime()/1000)},
+                "Book Management Project@#$%, team No.= 62",{expiresIn:"3h"});
+           
+              res.setHeader("x-api-key", token);
+              res.status(200).send({status:true, token:token})
         
 
     } catch (error) {

@@ -6,12 +6,12 @@ const authenticate = async function (req, res, next) {
         if(!token) token =req.headers["X-Api-Key"];
         if (!token) return res.status(400).send({ status: false, msg: "Token Required" });
     try{
-         let decodedToken = jwt.verify(token, "Book Management Project@#$%, team No.= 6")  
+         let decodedToken = jwt.verify(token, "Book Management Project@#$%, team No.= 62")  
         if (!decodedToken) return res.status(401).send({ status: false, msg: "Authentication failed" });
       }
       catch(err){
        return res.status(401).send({status:false,msg:"Sorry Your token is expires now"})
-      }
+     }
         next()
     }
     catch (err) {
