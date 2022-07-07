@@ -1,4 +1,6 @@
 //Sandip
+const jwt = require("jsonwebtoken")
+//const ObjectId = mongoose.Schema.Types.ObjectId;
 const bookModel = require('../models/bookModel')
 
 const { isEmpty, isValidISBN, isVerifyString, isValidDate } = require('../middleware/validation')
@@ -100,5 +102,26 @@ const getBooks = async function (req, res) {
     }
 }
 
+
+
+
+const deleteBooks = async function (req, res) {
+    try {
+        let book = req.params.bookId
+        console.log(book)
+        const check = await bookModel.findById(book)
+        if(check.isDeleted==true) return res.status(200).send({ status: false, msg: "data is already deleted" })
+        let DeletedBook = await bookModel.findByIdAndUpdate(  { _id: book }, {$set: { isDeleted: true }}, {new: true})
+        return res.status(200).send({ status: true, data: DeletedBook })
+    }
+    catch (err) {
+        console.log(err.message)
+        res.status(500).send({ status: false, msg: err.message })
+    }
+
+
+}
+
 module.exports.createBook = createBook;
 module.exports.getBooks = getBooks
+module.exports.deleteBooks=deleteBooks
