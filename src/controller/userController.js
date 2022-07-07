@@ -1,7 +1,7 @@
 const userModel = require('../models/userModel')
 
 const jwt=require('jsonwebtoken')
-const{isValidEmail,isValid,isEmpty,isVerifyString,validateMobile}=require('../middleware/validation')
+const{isValidEmail,isValid,isEmpty,isVerifyString,validateMobile,validPasward}=require('../middleware/validation')
 
 
 const createUser = async function (req , res) {
@@ -21,65 +21,52 @@ const createUser = async function (req , res) {
         if (!password) { return res.status(400).send({ status: false, msg: "password is required" }) }
         if (!email) { return res.status(400).send({ status: false, msg: "email is required" }) }
         if (!address) { return res.status(400).send({ status: false, msg: "address is required" }) }
+        if (!address.city) { return res.status(400).send({ status: false, msg: "city name is required in address" }) }
+        if (!address.pincode) { return res.status(400).send({ status: false, msg: "pincode is required" }) }
+
+
        
-        if (!isValid(title)) {
-            return res.status(400).send({ status: false, message: "Title must be present" })
-        };
-        const isValidTitle = function(title) {
-            return ['Mr', 'Mrs', 'Miss'].indexOf(title) !== -1
-        }
-        if (!isValidTitle(title)) {
-            return res.status(400).send({ status: false, message: `Title should be among Mr, Mrs or Miss` })
-        }
-        if (!isValid(name)) {
-            return res.status(400).send({ status: false, message: "name must be present" })
-        };
-        if (!isEmpty(name)) {
-            return res.status(400).send({status:false, message:"please provide a valid name"})
-        }
-        if (typeof name == 'number'){
-            return res.status(400).send({status:false, message: "provide a valid name"})
-        }
-        if (isVerifyString(name)) {
-            return res.status(400).send({status:false, message: "name can't contain number"})
-        } 
-        if (!isValid(phone)) {
-            return res.status(400).send({ status: false, message: "phone must be present" })
-        };
-       
+        // validation for title
+        if (!isValid(title)) {return res.status(400).send({ status: false, message: "Title must be present" })};
+        const isValidTitle = function(title) {return ['Mr', 'Mrs', 'Miss'].indexOf(title) !== -1}
+        if (!isValidTitle(title)) {return res.status(400).send({ status: false, message: `Title should be among Mr, Mrs or Miss` }) }
+
+        // validation for name
+        if (!isValid(name)) { return res.status(400).send({ status: false, message: "name must be present" })};
+        if (!isEmpty(name)) { return res.status(400).send({status:false, message:"please provide a valid name"})}
+        if (typeof name == 'number'){return res.status(400).send({status:false, message: "provide a valid name"})}
+        if (isVerifyString(name)) {return res.status(400).send({status:false, message: "name can't contain number"}) } 
+
+        // validation for Phone number
+        if (!isValid(phone)) {return res.status(400).send({ status: false, message: "phone must be present" }) };
         //validation for mobile number length and unique number
-    
-        if(!validateMobile(data.phone.trim())) return res.status(400).send({status:false, message:"mobile can't contain albhabets"})
-        if(data.phone.length!=10){
-            return res.status(400).send({status:false,message:"Number should be of 10 digits"})
-        }
+        if(!validateMobile(phone)) return res.status(400).send({status:false, message:"phone number is not valid, please provide a valid number"})
+        
+        // checking if phone number is already preasent in the collection
         if(await userModel.findOne({phone:data.phone})){
             return res.status(400).send({status:false, message:"PhoneNumber already exists. Please give another one"})
         }
-
-        if (!isValid(password)) {
-            return res.status(400).send({ status: false, message: "password must be present" })
-        };
-        if (!isValid(email)) {
-            return res.status(400).send({ status: false, message: "email must be present" })
-        };
-        if (!isValidEmail(email)) {
-            return res.status(400).send({status:false, message: "please provide a valid email"})
-        }
         
-        if(await userModel.findOne({email:data.email})){
-            return res.status(400).send({status:false, message:"Email already exists. Please give another one"})
-        }
-        if (!isValid(address)) {
-            return res.status(400).send({ status: false, message: "address must be present" })
-        };
-        if (address.pincode.length != 6) {
-            return res.status(400).send({status:false,message:"Pincode should be of 6 digits"})
+        // validation for email
+        if (!isValid(email)) { return res.status(400).send({ status: false, message: "email must be present" }) };
+        if (!isValidEmail(email)) { return res.status(400).send({status:false, message: "please provide a valid email"})}
+        // checking if given email is already preasent in the db collection
+        if(await userModel.findOne({email:data.email})){return res.status(400).send({status:false, message:"Email already exists. Please give another one"})}
 
-        }
+        // validation for passward
+        if (!isValid(password)) {return res.status(400).send({ status: false, message: "password must be present" })};
+        if (!validPasward(password)) {return res.status(400).send({status:false, message: "password shoud be 8 to 15 characters which contain at least one numeric digit, one uppercase and one lowercase letter"})}
+
+        //validation for address
+        if (!isValid(address)) { return res.status(400).send({ status: false, message: "address must be present" }) };
+        if (typeof address.city == 'number') {return res.status(400).send({status:false, message:"provide a valid city name"})}
+        if (isVerifyString(address.city)) {return res.status(400).send({status:false, message:"city name can't contain number"})}
+        if (address.pincode.length != 6) {return res.status(400).send({status:false,message:"Pincode should be of 6 digits"})}
+        if(!/^[1-9][0-9]{5}$/.test(address.pincode)) {return res.status(400).send({status:false,message:"please provide valid pincode"})}
+
+        
        
 
-        
         //saving user data into DB.
         const userData = await userModel.create(data)
         return res.status(201).send({ status: true, message: "Successfully saved User data", data: userData })
