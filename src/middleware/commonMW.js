@@ -13,7 +13,7 @@ const authenticate = async function (req, res, next) {
       }
       catch(err){
        return res.status(401).send({status:false,msg:"Sorry Your token is expires now"})
-      }
+     }
         next()
     }
     catch (err) {
@@ -51,8 +51,7 @@ const authorise = async function (req, res, next) {
     try {
     
         let book = req.params.bookId
-        console.log(book)
-        // if (!book) return res.status(404).send({ status: false, data: "ID not Found in path param" })
+        if (!book) return res.status(400).send({ status: false, data: "ID not Found in path param" })
         const check = await bookModel.findById(book)
         if (!check) return res.status(404).send({ status: false, msg: "data not found with this book id" })
         console.log(check)
