@@ -31,8 +31,6 @@ const validPasward = function checkPassword(password)
 }
 
 
-
-module.exports={isValidEmail,isEmpty,isValid,isVerifyString,validateMobile,validPasward}
 const isValidString = function(string) {
     if(/^([a-zA-Z. , ]){1,100}$/.test(string)) return true
 }
@@ -44,7 +42,7 @@ const isValidISBN = function(ISBN) {
 
 
 
-module.exports={isValidEmail,isEmpty,isValid,isVerifyString,validateMobile,isValidString,isValidISBN}
+module.exports={isValidEmail,isEmpty,isValid,isVerifyString,validateMobile,isValidString,isValidISBN, validPasward}
 
 
 

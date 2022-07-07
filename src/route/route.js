@@ -5,7 +5,7 @@ const express=require('express');
 const router=express.Router();
 const userController=require('../controller/userController')
 const bookController=require('../controller/bookController');
-const { authenticate, authorise } = require('../middleware/commonMW');
+const { authenticate, authorise, authoriseToCreateBook } = require('../middleware/commonMW');
 // const reviewController=require('../controller/reviewController')
 //......................Create User....................................//
 router.post('/register',userController.createUser)
@@ -16,7 +16,7 @@ router.post('/register',userController.createUser)
 
 router.post('/login',userController.loginUser)
 
-router.post('/books',authenticate, bookController.createBook)
+router.post('/books',authenticate,authoriseToCreateBook, bookController.createBook)
 router.get('/books',authenticate, bookController.getBooks)
 router.delete('/books/:bookId',authenticate,authorise, bookController.deleteBooks)
 

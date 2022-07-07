@@ -23,6 +23,30 @@ const authenticate = async function (req, res, next) {
 
 
 
+
+const authoriseToCreateBook = async function (req, res, next) {
+    try {
+
+        let user = req.body.userId
+        let check = await userModel.findById(user)
+        if(!check) return res.status(404).send({ status: false, msg: "give valid userId" })
+
+        let token = req.headers["x-api-key"];
+        let decodedToken = jwt.verify(token, "Book Management Project@#$%, team No.= 62")
+        console.log(check._id.toString())
+        if (decodedToken.id !== check._id.toString()) return res.status(401).send({ status: false, msg: "User logged is not allowed to create a book" })
+        
+    
+        next()
+       
+    }
+    catch (err) {
+        return res.status(500).send({ status: false, msg: err.message })
+    }
+}
+
+
+
 const authorise = async function (req, res, next) {
     try {
     
@@ -35,7 +59,7 @@ const authorise = async function (req, res, next) {
         let token = req.headers["x-api-key"];
         let decodedToken = jwt.verify(token, "Book Management Project@#$%, team No.= 62")
         console.log(check.userId.toString())
-        if (decodedToken.id !== check.userId.toString()) return res.status(401).send({ status: false, msg: "User logged is not allowed to delete the requested book data" })
+        if (decodedToken.id !== check.userId.toString()) return res.status(401).send({ status: false, msg: "User logged is not allowed to modify the requested book data" })
         next()
         //if (!mongoose.Types.ObjectId.isValid(book))  return res.status(400).send({ status: false, data: "please provide correct id" })
           
@@ -49,3 +73,4 @@ const authorise = async function (req, res, next) {
 
 module.exports.authenticate=authenticate
 module.exports.authorise=authorise
+module.exports.authoriseToCreateBook=authoriseToCreateBook
