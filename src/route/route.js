@@ -26,7 +26,7 @@ router.delete('/books/:bookId',authenticate,authorise, bookController.deleteBook
 
 
 //......................Get Book By ID....................................//
-router.get('/books/:bookId',bookController.getBookByID)
-router.put('/books/:bookId',bookController.updateBook)
+router.get('/books/:bookId',authenticate,authorise,bookController.getBookByID)
+router.put('/books/:bookId',authenticate,authorise,bookController.updateBook)
 
 module.exports = router;
