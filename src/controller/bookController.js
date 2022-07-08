@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken")
 const bookModel = require('../models/bookModel')
 const reviewModel = require('../models/reviewModel')
 const mongoose=require('mongoose')
-const { isEmpty, isValidISBN, isVerifyString, isValidDate } = require('../middleware/validation')
+const { isEmpty, isValidISBN, isVerifyString, isValidDate,isValidObjectId } = require('../middleware/validation')
 const userModel = require("../models/userModel")
 const { findOneAndUpdate } = require("../models/userModel")
 
@@ -35,7 +35,6 @@ const createBook = async function (req, res) {
         if (!checkUserId)
             return res.status(400).send({ status: false, msg: "userId don't Exist" })
 
-
         let ISBNnumber = data.ISBN;
         let checkISBN = await bookModel.findOne({ ISBN: ISBNnumber })
         if (checkISBN)
@@ -49,11 +48,8 @@ const createBook = async function (req, res) {
 
         if (!isValidDate(releasedAt)) return res.status(400).send({ status: false, message: "Enter a valid date with the format (YYYY-MM-DD)" })
 
-
         if (!isEmpty(subcategory)) { return res.status(400).send({ status: false, msg: "subcategory is required" }) }
         if (isVerifyString(subcategory)) return res.status(400).send({ status: false, message: "subcategory can't contain number" })
-
-
 
         let bookData = await bookModel.create(data);
         res.status(201).send({ status: true, msg: bookData })
@@ -69,8 +65,19 @@ const getBooks = async function (req, res) {
     try {
 
         let allQuery = req.query
-        let booksDetail = await bookModel.find(({ $and: [allQuery, { isDeleted: false }] }))
-        console.log(booksDetail)
+        let temp={}
+        if(allQuery.userId){
+        if (!isValidObjectId(allQuery.userId))  return res.status(400).send({ status: false, data: "please provide correct id" })
+            temp["userId"]=allQuery.userId
+        }
+        if(allQuery.category){
+            temp["category"]=allQuery.category.toLowerCase()
+        }
+        if(allQuery.subcategory){
+            temp["subcategory"]=allQuery.subcategory.toLowerCase()
+        }
+        let booksDetail = await bookModel.find(({ $and: [temp, { isDeleted: false }] }))
+      
         if (booksDetail == false)
             res.status("404").send({ status: false, msg: "data not found" })
         else {
@@ -82,24 +89,20 @@ const getBooks = async function (req, res) {
                     "userId": booksDetail[i].userId,
                     "category": booksDetail[i].category,
                     "releasedAt": booksDetail[i].releasedAt,
-                    "reviews": booksDetail[i].reviews
+                    "reviews": booksDetail[i].reviews,
                 }
                 data.push(books)
-
-
             }
             data.sort(function (a, b) {
                 if (a.title.toLowerCase() < b.title.toLowerCase()) return -1;
                 if (a.title.toLowerCase() > b.title.toLowerCase()) return 1
                 return 0;
             })
-
-
-            console.log(data)
             res.status(200).send({ status: true, message: "Books List", data: data })
         }
     }
     catch (err) {
+        console.log(err)
         res.status(500).send({ status: false, msg: err.message })
     }
 } 
@@ -109,8 +112,7 @@ let getBookByID=async function(req,res){
     try {
         let data=req.params.bookId
         if(!data)return res.status(400).send({status:false,msg:""})
-        if(data.length !=24) return res.status(400).send({status:false,msg:"enter valid objectID"}) 
-             //    if(!(mongoose.Types.ObjectId.isValid(data)))return res.status(400).send({status:false,msg:"enter valid objectID"}) 
+        if (!isValidObjectId(data))  return res.status(400).send({ status: false, data: "please provide correct id" })
         let findBook=await bookModel.findOne({_id:data}).lean()
         if(!findBook)return res.status(404).send({status:false, meg:"No Data Found For this ID"})
         let findReview=await reviewModel.find({bookId:data})
