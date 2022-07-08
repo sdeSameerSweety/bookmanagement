@@ -65,6 +65,15 @@ const getBooks = async function (req, res) {
     try {
 
         let allQuery = req.query
+        let checkInput= Object.keys(allQuery)
+        let  arr=['category','userId','subcategory'] 
+       
+         for(let i=0;i<checkInput.length;i++){
+        
+        let as=arr.includes(checkInput[i]) 
+        if(!as)return res.status(400).send({status:false,msg:"query should be one of these:category, subcategory, userId"})
+        }
+    
         let temp={}
         if(allQuery.userId){
         if (!isValidObjectId(allQuery.userId))  return res.status(400).send({ status: false, data: "please provide correct id" })
