@@ -115,8 +115,7 @@ let getBookByID=async function(req,res){
         if(!findBook)return res.status(404).send({status:false, meg:"No Data Found For this ID"})
         let findReview=await reviewModel.find({bookId:data})
         ReviewCount=findReview.length
-        console.log(ReviewCount)
-        findBook.reviews=ReviewCount  
+        findBook.reviews=ReviewCount
         findBook['reviewsData']=findReview
         return res.status(200).send({status:true,message:'Books list',Data:findBook})
     } catch (error) {
@@ -129,10 +128,9 @@ const deleteBooks = async function (req, res) {
         let book = req.params.bookId
         console.log(book)
         const check = await bookModel.findById(book)
-        
         if(check.isDeleted==true) return res.status(200).send({ status: false, msg: "data is already deleted" })
-        let DeletedBook = await bookModel.findByIdAndUpdate(  { _id: book }, {$set: { isDeleted: true }}, {new: true})
-        return res.status(200).send({ status: true, data: DeletedBook })
+        let DeletedBook = await bookModel.findByIdAndUpdate(  { _id: book }, {$set: { isDeleted: true }})
+        return res.status(200).send({ status: true, data:"Deleted successfully " })
     }
     catch (err) {
         console.log(err.message)
