@@ -96,7 +96,7 @@ let loginUser=async function(req,res){
              if(!findEmail)return res.status(404).send({status:false,msg:"User not found"})
          //   if password is wrong
              if((findEmail.password!=password)) return res.status(401).send({status:false,msg:"invalid password"})
-        //generate JWT
+         //   generate JWT
              let token=jwt.sign(
              {
                 id: findEmail._id.toString(),
