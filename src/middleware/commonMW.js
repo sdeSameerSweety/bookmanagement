@@ -1,22 +1,24 @@
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/userModel");
 const bookModel= require("../models/bookModel")
+const {isValidObjectId}= require("../middleware/validation")
+const mongoose=require('mongoose')
+
 
 const authenticate = async function (req, res, next) {
     try {
         let token = req.headers["x-api-key"];
         if(!token) token =req.headers["X-Api-Key"];
         if (!token) return res.status(400).send({ status: false, msg: "Token Required" });
-    try{
+    
          let decodedToken = jwt.verify(token, "Book Management Project@#$%, team No.= 62")  
-        if (!decodedToken) return res.status(401).send({ status: false, msg: "Authentication failed" });
-      }
-      catch(err){
-       return res.status(401).send({status:false,msg:"Sorry Your token is expires now"})
-     }
+         if (!decodedToken) return res.status(401).send({ status: false, msg: "Authentication failed" });
+    
+  
         next()
     }
     catch (err) {
+        if(err.message=="jwt expired") return res.status(401).send({status:false,msg:" Your token is expires "})
         return res.status(500).send({ status: false, msg: err.message })
     }
 }
@@ -26,10 +28,12 @@ const authenticate = async function (req, res, next) {
 
 const authoriseToCreateBook = async function (req, res, next) {
     try {
-
+        let data = req.body;
+        if (Object.keys(data).length == 0) {return res.status(400).send({ status: false, msg: "Enter the Books details" }) }
         let user = req.body.userId
+        if (!isValidObjectId(user))  return res.status(400).send({ status: false, data: "please provide correct id" })
         let check = await userModel.findById(user)
-        if(!check) return res.status(404).send({ status: false, msg: "give valid userId" })
+        if(!check) return res.status(404).send({ status: false, msg: "User Id not found" })
 
         let token = req.headers["x-api-key"];
         let decodedToken = jwt.verify(token, "Book Management Project@#$%, team No.= 62")
@@ -51,6 +55,9 @@ const authorise = async function (req, res, next) {
     try {
     
         let book = req.params.bookId
+
+      if (!isValidObjectId(book))  return res.status(400).send({ status: false, data: "please provide correct id" })
+ 
         if (!book) return res.status(400).send({ status: false, data: "ID not Found in path param" })
         const check = await bookModel.findById(book)
         if (!check) return res.status(404).send({ status: false, msg: "data not found with this book id" })
@@ -60,7 +67,7 @@ const authorise = async function (req, res, next) {
         console.log(check.userId.toString())
         if (decodedToken.id !== check.userId.toString()) return res.status(401).send({ status: false, msg: "User logged is not allowed to modify the requested book data" })
         next()
-        //if (!mongoose.Types.ObjectId.isValid(book))  return res.status(400).send({ status: false, data: "please provide correct id" })
+       
           
     }
     catch (err) {

@@ -23,15 +23,19 @@ const bookSchema = new mongoose.Schema({
     ISBN: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        lowercase:true
+
     },
     category: {
         type: String,
-        required: true
+        required: true,
+        lowercase:true
     },
     subcategory: [{
         type: String,
-        required: true
+        required: true,
+        lowercase:true
     }],
     reviews: {
         type: Number,
