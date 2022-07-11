@@ -90,7 +90,7 @@ const getBooks = async function (req, res) {
         let booksDetail = await bookModel.find(({ $and: [temp, { isDeleted: false }] }))
       
         if (booksDetail == false)
-            res.status("404").send({ status: false, msg: "data not found" })
+            return res.status("404").send({ status: false, msg: "data not found" })
         else {
             let data = []
             for (let i = 0; i < booksDetail.length; i++) {
@@ -126,7 +126,7 @@ let getBookByID=async function(req,res){
         if (!isValidObjectId(data))  return res.status(400).send({ status: false, data: "please provide correct id" })
         let findBook=await bookModel.findOne({_id:data}).lean()
         if(!findBook)return res.status(404).send({status:false, meg:"No Data Found For this ID"})
-        let findReview=await reviewModel.find({bookId:data})
+        let findReview=await reviewModel.find(({ $and: [{bookId: data},{ isDeleted: false }] }))
         ReviewCount=findReview.length
         findBook.reviews=ReviewCount
         findBook['reviewsData']=findReview

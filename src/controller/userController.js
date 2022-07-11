@@ -1,7 +1,7 @@
 const userModel = require('../models/userModel')
 
 const jwt=require('jsonwebtoken')
-const{isValidEmail,isValid,isEmpty,isVerifyString,validateMobile,validPassword}=require('../middleware/validation')
+const{isValidEmail,isValid,isEmpty,isVerifyString,validateMobile,validPassword,isValidString}=require('../middleware/validation')
 
 
 const createUser = async function (req , res) {
@@ -36,6 +36,7 @@ const createUser = async function (req , res) {
         if (!isEmpty(name)) { return res.status(400).send({status:false, message:"please provide a valid name"})}
         if (typeof name == 'number'){return res.status(400).send({status:false, message: "provide a valid name"})}
         if (isVerifyString(name)) {return res.status(400).send({status:false, message: "name can't contain number"}) } 
+        if (!isValidString(name)) {return res.status(400).send({status:false, message: "name can't contain symbols"}) }
 
         // validation for Phone number
         if (!isValid(phone)) {return res.status(400).send({ status: false, message: "phone must be present" }) };

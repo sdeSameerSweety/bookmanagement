@@ -4,20 +4,15 @@ const bookModel = require('../models/bookModel')
 
 //Adding review for a specific book.
 const addReview = async function (req, res) {
-    // try {
+    try {
         const bookId = req.params.bookId //accessing bookId from params.
         requestReviewBody = req.body
         // const { reviewedBy, rating, review } = requestReviewBody;
          let reviewedBy= requestReviewBody.reviewedBy;
         let rating= requestReviewBody.rating;
-
         let review= requestReviewBody.review;
 
 
-
-        // if(requestReviewBody.reviewedBy=="" || requestReviewBody.reviewedBy==" " ) {
-        //     requestReviewBody.reviewedBy = "Guest"
-        // }
         if (!validator.isEmpty(reviewedBy)) {
             requestReviewBody.reviewedBy = "Guest"
         }
@@ -27,10 +22,7 @@ const addReview = async function (req, res) {
         if (!Object.keys(requestReviewBody).includes("reviewedBy")) {
             requestReviewBody["reviewedBy"]= "Guest"
         }
-        // console.log(Object.keys(requestReviewBody))
-        // let keys = Object.keys(requestReviewBody)
-        // // if(keys.includes(reviewedBy))
-        // console.log(keys.includes("reviewedBy"))
+        
 
         // if (!reviewedBy) { return res.status(400).send({ status: false, msg: "reviewedBy field is required" }) }
         if (!rating) { return res.status(400).send({ status: false, msg: "rating field is required" }) }
@@ -79,9 +71,36 @@ const addReview = async function (req, res) {
             isDeleted: 0
         })
         return res.status(201).send({ status: true, message: `Review added successfully for ${searchBook.title}`, data: response })
-    // } catch (err) {
-    //     return res.status(500).send({ status: false, Error: err.message })
-    // }
+    } catch (err) {
+        return res.status(500).send({ status: false, Error: err.message })
+    }
 }
 
 module.exports.addReview = addReview
+
+
+const deleteReviews = async function (req, res) {
+    try {
+        let book = req.params.bookId
+        let review = req.params.reviewId
+        // console.log(review)
+        let findBook=await bookModel.findOne({_id:book}).lean()
+        const check = await reviewModel.findOne({_id : review,bookId: book})
+        if(!check) return res.status(200).send({status:false,message:'wrong ids'})
+        let DeletedBook = await reviewModel.findByIdAndUpdate(  { _id: review }, {$set: { isDeleted: true }})
+        let findreviews= await reviewModel.find(({ $and: [{bookId: book},{ isDeleted: false }] }))
+        ReviewCount=findreviews.length
+        findBook.reviews=ReviewCount
+        findBook['reviewsData']=findreviews        
+        return res.status(200).send({status:true,message:'Books list',Data:findBook})
+     
+    }
+    catch (err) {
+        console.log(err.message)
+        res.status(500).send({ status: false, msg: err.message })
+    }
+
+
+};
+
+module.exports.deleteReviews=deleteReviews
