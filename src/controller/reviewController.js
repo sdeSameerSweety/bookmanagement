@@ -4,28 +4,48 @@ const bookModel = require('../models/bookModel')
 
 //Adding review for a specific book.
 const addReview = async function (req, res) {
-    try {
+    // try {
         const bookId = req.params.bookId //accessing bookId from params.
         requestReviewBody = req.body
-        const { reviewedBy, rating, review } = requestReviewBody;
+        // const { reviewedBy, rating, review } = requestReviewBody;
+         let reviewedBy= requestReviewBody.reviewedBy;
+        let rating= requestReviewBody.rating;
 
-        if (!reviewedBy) { return res.status(400).send({ status: false, msg: "reviewedBy field is required" }) }
+        let review= requestReviewBody.review;
+
+
+
+        // if(requestReviewBody.reviewedBy=="" || requestReviewBody.reviewedBy==" " ) {
+        //     requestReviewBody.reviewedBy = "Guest"
+        // }
+        if (!validator.isEmpty(reviewedBy)) {
+            requestReviewBody.reviewedBy = "Guest"
+        }
+        
+        //for empty request body.
+        if (Object.keys(requestReviewBody).length == 0) { res.status(400).send({ status: false, msg: "Enter the Books details" }) }
+        if (!Object.keys(requestReviewBody).includes("reviewedBy")) {
+            requestReviewBody["reviewedBy"]= "Guest"
+        }
+        // console.log(Object.keys(requestReviewBody))
+        // let keys = Object.keys(requestReviewBody)
+        // // if(keys.includes(reviewedBy))
+        // console.log(keys.includes("reviewedBy"))
+
+        // if (!reviewedBy) { return res.status(400).send({ status: false, msg: "reviewedBy field is required" }) }
         if (!rating) { return res.status(400).send({ status: false, msg: "rating field is required" }) }
         if (!review) { return res.status(400).send({ status: false, msg: "review is required" }) }
 
 
         //validation starts.
         if (!validator.isValidObjectId(bookId)) {return res.status(400).send({ status: false, message: "Invalid bookId." })}
-
-        //for empty request body.
-        if (Object.keys(requestReviewBody).length == 0) { res.status(400).send({ status: false, msg: "Enter the Books details" }) }
+      
         
-        
-        
-        if (!validator.isValid(reviewedBy)) { return res.status(400).send({ status: false, message: "Reviewer's name must be present" })};
-        if (!validator.isEmpty(reviewedBy)) { return res.status(400).send({status:false, message:"please provide a valid Reviewer's name"})}
+        console.log(requestReviewBody)
+         //if (!validator.isValid(reviewedBy)) { return res.status(400).send({ status: false, message: "Reviewer's name must be present" })};
+         //if (!validator.isEmpty(reviewedBy)) { return res.status(400).send({status:false, message:"please provide a valid Reviewer's name"})}
         if (typeof reviewedBy == 'number'){return res.status(400).send({status:false, message: "provide a valid Reviewer's name"})}
-        if (validator.isVerifyString(reviewedBy)) {return res.status(400).send({status:false, message: "Reviewer's name can't contain number"})}
+        //if (validator.isVerifyString(reviewedBy)) {return res.status(400).send({status:false, message: "Reviewer's name can't contain number"})}
 
         
         if (!validator.isValid(rating)) {return res.status(400).send({ status: false, message: "Rating is required" })}
@@ -59,9 +79,9 @@ const addReview = async function (req, res) {
             isDeleted: 0
         })
         return res.status(201).send({ status: true, message: `Review added successfully for ${searchBook.title}`, data: response })
-    } catch (err) {
-        return res.status(500).send({ status: false, Error: err.message })
-    }
+    // } catch (err) {
+    //     return res.status(500).send({ status: false, Error: err.message })
+    // }
 }
 
 module.exports.addReview = addReview

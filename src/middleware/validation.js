@@ -1,6 +1,6 @@
 const isValid = function (value) {
     if (typeof value === "undefined" || typeof value === "null") return false
-    if (value == null) return false
+    if (value === null) return false
     return true
 }
 const isEmpty = function (value) {
@@ -9,7 +9,7 @@ const isEmpty = function (value) {
 }
 const isValidEmail = (mail) => {
     let  trimEmail=mail.trim()
-    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(trimEmail))
+    if (/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(trimEmail))
         return true
 }
 
@@ -32,7 +32,7 @@ const validateMobile = function(number) {
 
 const validPassword = function checkPassword(password)
 {
-    var re = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+    var re = /^(?=.\d)(?=.[!@#$%^&])(?=.[a-z])(?=.*[A-Z]).{8,}$/;
     return re.test(password);
 }
 
@@ -47,7 +47,7 @@ const isValidISBN = function (ISBN) {
 
 const isValidDate = function (Date) {
     let trimDate=Date.trim()
-    if (/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(trimDate)) return true
+    if (/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(Date)) return true
 }
 
 const isValidObjectId=function(id){
@@ -55,7 +55,3 @@ const isValidObjectId=function(id){
     return (regexObjectID.test(id))
     }
 module.exports = { isValidEmail, isEmpty, isValid, isVerifyString, validateMobile, isValidString, isValidISBN, isValidDate,validPassword,isValidObjectId }
-
-
-
-

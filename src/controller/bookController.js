@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken")
-//const ObjectId = mongoose.Schema.Types.ObjectId;
+
 const bookModel = require('../models/bookModel')
 const reviewModel = require('../models/reviewModel')
 const mongoose=require('mongoose')
-const { isEmpty, isValidISBN, isVerifyString, isValidDate,isValidObjectId, isValid } = require('../middleware/validation')
+const { isEmpty, isValidISBN, isVerifyString, isValidDate,isValidObjectId  } = require('../middleware/validation')
 const userModel = require("../models/userModel")
 const { findOneAndUpdate } = require("../models/userModel")
 
@@ -15,7 +15,7 @@ const createBook = async function (req, res) {
         const { title, excerpt, userId, ISBN, category, subcategory, releasedAt } = data
 
         // checking if request body is empty
-        if (Object.keys(data).length == 0) { res.status(400).send({ status: false, msg: "Enter the Books details" }) }
+        if (Object.keys(data).length == 0) { return res.status(400).send({ status: false, msg: "Enter the Books details" }) }
 
         // checking if requireq fields is provided in request body
         if (!title) { return res.status(400).send({ status: false, msg: "title is required" }) }
@@ -24,11 +24,11 @@ const createBook = async function (req, res) {
         if (!ISBN) { return res.status(400).send({ status: false, msg: "ISBN is required" }) }
         if (!category) { return res.status(400).send({ status: false, msg: "category is required" }) }
         if (!subcategory) { return res.status(400).send({ status: false, msg: "subcategory is required" }) }
+        if (!releasedAt) { return res.status(400).send({ status: false, msg: "releasedAt is required" }) }
+
 
         // checking if requireq fields is empty in request body
         if (!isEmpty(title)) return res.status(400).send({ status: false, msg: "Please enter Title" })
-        if (!isValid(title)) return res.status(400).send({ status: false, msg: "Please enter Title" })
-
 
         if (!isEmpty(excerpt)) { return res.status(400).send({ status: false, msg: "excerpt is required" }) }
 
@@ -43,25 +43,21 @@ const createBook = async function (req, res) {
             return res.status(400).send({ status: false, msg: "ISBN Number already Exist" })
 
         if (!isEmpty(ISBN)) { return res.status(400).send({ status: false, msg: "ISBN is required" }) }
-        if (!isValid(ISBN)) { return res.status(400).send({ status: false, msg: "ISBN is required" }) }
         if (!isValidISBN(ISBN)) { return res.status(400).send({ status: false, msg: "ISBN is not valid" }) }
 
-
         if (!isEmpty(category)) { return res.status(400).send({ status: false, msg: "category is required" }) }
-        if (!isValid(category)) { return res.status(400).send({ status: false, msg: "category is not valid" }) }
         if (isVerifyString(category)) return res.status(400).send({ status: false, message: "category can't contain number" })
 
         if (!isValidDate(releasedAt)) return res.status(400).send({ status: false, message: "Enter a valid date with the format (YYYY-MM-DD)" })
 
         if (!isEmpty(subcategory)) { return res.status(400).send({ status: false, msg: "subcategory is required" }) }
-        if (!isValid(subcategory)) { return res.status(400).send({ status: false, msg: "category is required" }) }
         if (isVerifyString(subcategory)) return res.status(400).send({ status: false, message: "subcategory can't contain number" })
 
         let bookData = await bookModel.create(data);
         res.status(201).send({ status: true, msg: bookData })
 
     } catch (error) {
-        console.log( error.message)
+        console.log("Server Error", error.message)
         res.status(500).send({ status: false, msg: "Server Error: " + error.message })
     }
 
