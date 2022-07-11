@@ -1,7 +1,7 @@
 const userModel = require('../models/userModel')
 
 const jwt=require('jsonwebtoken')
-const{isValidEmail,isValid,isEmpty,isVerifyString,validateMobile,validPasward}=require('../middleware/validation')
+const{isValidEmail,isValid,isEmpty,isVerifyString,validateMobile,validPassword}=require('../middleware/validation')
 
 
 const createUser = async function (req , res) {
@@ -55,7 +55,7 @@ const createUser = async function (req , res) {
 
         // validation for passward
         if (!isValid(password)) {return res.status(400).send({ status: false, message: "password must be present" })};
-        if (!validPasward(password)) {return res.status(400).send({status:false, message: "password shoud be 8 to 15 characters which contain at least one numeric digit, one uppercase and one lowercase letter"})}
+        if (!validPassword(password)) {return res.status(400).send({status:false, message: "password shoud be 8 to 15 characters which contain at least one numeric digit, one uppercase and one lowercase letter"})}
 
         //validation for address
         if (!isValid(address)) { return res.status(400).send({ status: false, message: "address must be present" }) };

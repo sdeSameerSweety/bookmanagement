@@ -24,13 +24,13 @@ const isValidString = function (string) {
 
 
 const validateMobile = function(number) {
-    let trim = number.trim()
+    let trimMobile = number.trim()
   var  reg = /^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$/
-  return  reg.test(trim) ;
+  return  reg.test(trimMobile) ;
 }
 
 
-const validPasward = function checkPassword(password)
+const validPassword = function checkPassword(password)
 {
     var re = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
     return re.test(password);
@@ -50,10 +50,11 @@ const isValidDate = function (Date) {
     if (/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(trimDate)) return true
 }
 
-
-
-
-module.exports = { isValidEmail, isEmpty, isValid, isVerifyString, validateMobile, isValidString, isValidISBN, isValidDate,validPasward }
+const isValidObjectId=function(id){
+    const regexObjectID = /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i
+    return (regexObjectID.test(id))
+    }
+module.exports = { isValidEmail, isEmpty, isValid, isVerifyString, validateMobile, isValidString, isValidISBN, isValidDate,validPassword,isValidObjectId }
 
 
 
