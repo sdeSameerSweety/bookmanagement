@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/userModel");
 const bookModel= require("../models/bookModel")
+const reviewModel= require("../models/reviewModel")
 const {isValidObjectId}= require("../middleware/validation")
 const mongoose=require('mongoose')
 
@@ -76,7 +77,39 @@ const authorise = async function (req, res, next) {
 }
 
 
+const authoriseToDeleteReviews = async function (req, res, next) {
+    try {
+        let book = req.params.bookId
+        console.log(book)
+        let review = req.params.reviewId
+
+      if (!isValidObjectId(review))  return res.status(400).send({ status: false, data: "please provide correct id" })
+ 
+        if (!review) return res.status(400).send({ status: false, data: "ID not Found in path param" })
+        const check = await reviewModel.findById(review)
+        if (!check) return res.status(404).send({ status: false, msg: "data not found with this id" })
+        console.log(check)
+        checkBookId = check.bookId.toString()
+        console.log(checkBookId)
+        const dbCheckBookId= await bookModel.findById(checkBookId)
+        checkUserId= dbCheckBookId.userId
+        console.log(checkUserId)
+        let token = req.headers["x-api-key"];
+        let decodedToken = jwt.verify(token, "Book Management Project@#$%, team No.= 62")
+        console.log(checkUserId.toString())
+        if (decodedToken.id !== checkUserId.toString()) return res.status(401).send({ status: false, msg: "User logged is not allowed to modify the requested book data" })
+        next()
+       
+          
+    }
+    catch (err) {
+        return res.status(500).send({ status: false, msg: err.message })
+    }
+}
+
+
 
 module.exports.authenticate=authenticate
 module.exports.authorise=authorise
 module.exports.authoriseToCreateBook=authoriseToCreateBook
+module.exports.authoriseToDeleteReviews=authoriseToDeleteReviews

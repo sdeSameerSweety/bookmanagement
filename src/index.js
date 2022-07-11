@@ -1,6 +1,6 @@
 const express=require('express');
 const bodyParser=require('body-parser');
-const route=require('./route/route');
+const router=require('./route/route');
 const app=express();
 const mongoose=require('mongoose');
 
@@ -15,7 +15,7 @@ mongoose.connect("mongodb+srv://samirlohiya909:Lohiya123@samirlohiya.nszppy8.mon
 .catch ( err => console.log(err) )
 
 
-app.use('/',route)
+app.use('/',router)
 
 
 app.listen(process.env.PORT || 3000, function () {

@@ -66,6 +66,15 @@ const getBooks = async function (req, res) {
 
         let allQuery = req.query
 
+        let checkInput= Object.keys(allQuery)
+        let  arr=['category','userId','subcategory'] 
+       
+         for(let i=0;i<checkInput.length;i++){
+        
+        let as=arr.includes(checkInput[i]) 
+        if(!as)return res.status(400).send({status:false,msg:"query should be one of these:category, subcategory, userId"})
+        }
+    
         let temp={}
         if(allQuery.userId){
         if (!isValidObjectId(allQuery.userId))  return res.status(400).send({ status: false, data: "please provide correct id" })
@@ -116,7 +125,7 @@ let getBookByID=async function(req,res){
         if (!isValidObjectId(data))  return res.status(400).send({ status: false, data: "please provide correct id" })
         let findBook=await bookModel.findOne({_id:data}).lean()
         if(!findBook)return res.status(404).send({status:false, meg:"No Data Found For this ID"})
-        let findReview=await reviewModel.find({bookId:data})
+        let findReview=await reviewModel.find(({ $and: [{bookId: data},{ isDeleted: false }] }))
         ReviewCount=findReview.length
         findBook.reviews=ReviewCount
         findBook['reviewsData']=findReview
