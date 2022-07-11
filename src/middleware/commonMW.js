@@ -30,7 +30,7 @@ const authoriseToCreateBook = async function (req, res, next) {
     try {
 
         let user = req.body.userId
-        if (!isValidObjectId(book))  return res.status(400).send({ status: false, data: "please provide correct id" })
+        if (!isValidObjectId(user))  return res.status(400).send({ status: false, data: "please provide correct id" })
         let check = await userModel.findById(user)
         if(!check) return res.status(404).send({ status: false, msg: "User Id not found" })
 
