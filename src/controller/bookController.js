@@ -1,11 +1,8 @@
-const jwt = require("jsonwebtoken")
-//const ObjectId = mongoose.Schema.Types.ObjectId;
 const bookModel = require('../models/bookModel')
 const reviewModel = require('../models/reviewModel')
-const mongoose=require('mongoose')
 const { isEmpty, isValidISBN, isVerifyString, isValidDate } = require('../middleware/validation')
 const userModel = require("../models/userModel")
-const { findOneAndUpdate } = require("../models/userModel")
+
 
 const createBook = async function (req, res) {
 
@@ -187,6 +184,24 @@ let updateBook=async function (req,res){
     }
 } 
 
+let updateReview = async function(req, res){
+    let book = req.params.bookId;
+    const findBook = await bookModel.findOne({_id:book,isDeleted:false}).lean()
+    if(!findBook) return res.status(404).send({ status: false, msg:"No book found"  })
+
+    let data = {};
+
+    if(data.title){
+        trimTitle=data.title.trim()
+        findBook.title=trimTitle
+        const checkTitle = await bookModel.findOne({title:trimTitle})
+        if(checkTitle)return res.status(400).send({status:false,msg:"this title:"+trimTitle +" "+"already present in database"})
+        temp["title"]=trimTitle
+    }
+
+    return res.status(200).send({status:true,msg:"Updated success"})
+}
+
 
 
 module.exports.createBook = createBook;
@@ -194,3 +209,4 @@ module.exports.getBooks = getBooks
 module.exports.deleteBooks=deleteBooks
 module.exports.getBookByID=getBookByID
 module.exports.updateBook=updateBook
+module.exports.updateReview=updateReview

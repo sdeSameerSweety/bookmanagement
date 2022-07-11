@@ -4,7 +4,7 @@ const userController=require('../controller/userController')
 const bookController=require('../controller/bookController');
 const { authenticate, authorise, authoriseToCreateBook } = require('../middleware/commonMW');
 // const reviewController=require('../controller/reviewController')
-const reviewController=require('../controller/reviewController')
+//const reviewController=require('../controller/reviewController')
 
 
 //......................Create User....................................//
@@ -28,5 +28,6 @@ router.delete('/books/:bookId',authenticate,authorise, bookController.deleteBook
 //......................Get Book By ID....................................//
 router.get('/books/:bookId',bookController.getBookByID)
 router.put('/books/:bookId',bookController.updateBook)
+router.put('/books/:bookId/review',bookController.updateReview)
 
 module.exports = router;
