@@ -1,12 +1,12 @@
-//hempal 1st API 
-//samir 2nd API 
-
 const express=require('express');
 const router=express.Router();
 const userController=require('../controller/userController')
 const bookController=require('../controller/bookController');
-const { authenticate } = require('../middleware/commonMW');
+const { authenticate, authorise, authoriseToCreateBook } = require('../middleware/commonMW');
 // const reviewController=require('../controller/reviewController')
+const reviewController=require('../controller/reviewController')
+
+
 //......................Create User....................................//
 router.post('/register',userController.createUser)
 
@@ -15,15 +15,21 @@ router.post('/register',userController.createUser)
 //......................Login User....................................//
 
 router.post('/login',userController.loginUser)
-router.post('/books',bookController.createBook)
-// router.post('/login',userController.loginUser)
-router.post('/books',authenticate, bookController.createBook)
+
+router.post('/books',authenticate,authoriseToCreateBook, bookController.createBook)
 router.get('/books',authenticate, bookController.getBooks)
 
-router.post('/login',userController.loginUser)
 
-//......................Get Book By Query....................................//
-// router.get('/books/:bookId',bookController.getBookByQuery)
 
+
+router.delete('/books/:bookId',authenticate,authorise, bookController.deleteBooks)
+
+
+//......................Get Book By ID....................................//
+router.get('/books/:bookId',authenticate,bookController.getBookByID)
+router.put('/books/:bookId',authenticate,authorise,bookController.updateBook)
+
+// ........................Add Review.....................................//
+router.post('/books/:bookId/review',reviewController.addReview)
 
 module.exports = router;

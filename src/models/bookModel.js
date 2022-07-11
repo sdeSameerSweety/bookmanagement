@@ -1,6 +1,5 @@
 //Sandip
 const mongoose = require('mongoose')
-var moment = require('moment');
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const bookSchema = new mongoose.Schema({
@@ -9,10 +8,12 @@ const bookSchema = new mongoose.Schema({
         required: true,
         unique: true,
         trim: true,
+        lowercase:true
     },
     excerpt: {
         type: String,
-        required: true
+        required: true,
+        trim: true,
     },
     userId: {
         type: ObjectId,
@@ -22,15 +23,19 @@ const bookSchema = new mongoose.Schema({
     ISBN: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        lowercase:true
+
     },
     category: {
         type: String,
-        required: true
+        required: true,
+        lowercase:true
     },
     subcategory: [{
         type: String,
-        required: true
+        required: true,
+        lowercase:true
     }],
     reviews: {
         type: Number,
@@ -43,8 +48,8 @@ const bookSchema = new mongoose.Schema({
     },
 
     releasedAt: {
-        type: String,
-        required: true  // format("YYYY-MM-DD")
+        type: Date,
+        required: true
     },
 
 }, { timestamps: true });
