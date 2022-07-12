@@ -20,9 +20,9 @@ const createUser = async function (req , res) {
         if (!phone) { return res.status(400).send({ status: false, msg: "phone is required" }) }
         if (!password) { return res.status(400).send({ status: false, msg: "password is required" }) }
         if (!email) { return res.status(400).send({ status: false, msg: "email is required" }) }
-        if (!address) { return res.status(400).send({ status: false, msg: "address is required" }) }
-        if (!address.city) { return res.status(400).send({ status: false, msg: "city name is required in address" }) }
-        if (!address.pincode) { return res.status(400).send({ status: false, msg: "pincode is required" }) }
+        //if (!address) { return res.status(400).send({ status: false, msg: "address is required" }) }
+        //if (!address.city) { return res.status(400).send({ status: false, msg: "city name is required in address" }) }
+        //if (!address.pincode) { return res.status(400).send({ status: false, msg: "pincode is required" }) }
 
 
        
@@ -56,8 +56,9 @@ const createUser = async function (req , res) {
 
         // validation for passward
         if (!isValid(password)) {return res.status(400).send({ status: false, message: "password must be present" })};
+        console.log(password)
         if (!validPassword(password)) {return res.status(400).send({status:false, message: "password shoud be 8 to 15 characters which contain at least one numeric digit, one uppercase and one lowercase letter"})}
-
+        console.log(password)
         //validation for address
         if (!isValid(address)) { return res.status(400).send({ status: false, message: "address must be present" }) };
         if (typeof address.city == 'number') {return res.status(400).send({status:false, message:"provide a valid city name"})}

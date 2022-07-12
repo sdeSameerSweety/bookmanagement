@@ -72,7 +72,7 @@ let updateReview = async function (req, res) {
         let book = req.params.bookId;
         let reviewId = req.params.reviewId;
         
-        if(validator.isValidObjectId(book)){return res.status(400).send({ status: false, message: "Invalid bookId." })}
+        //if(validator.isValidObjectId(book)){return res.status(400).send({ status: false, message: "Invalid bookId." })}
        
         const findBook = await bookModel.findOne({ _id: book, isDeleted: false }).lean()
         if (!findBook) res.status(404).send({ status: false, msg: "No book found" })
@@ -116,10 +116,10 @@ const deleteReviews = async function (req, res) {
         const findReviewData = await reviewModel.findOne({_id : review,bookId: book,isDeleted:false})
         if(!findReviewData) return res.status(404).send({status:false,message:'No review Data Found'})
        
-        const findBookData = await bookModel.findOne({_id :book,isDeleted:false})
-        if(!findBookData) return res.status(404).send({status:false,message:'No Book Data  Found '})
+        // const findBookData = await bookModel.findOne({_id :book,isDeleted:false})
+        // if(!findBookData) return res.status(404).send({status:false,message:'No Book Data  Found '})
        
-        let changeReviewCount= await bookModel.findOneAndUpdate( {isDeleted: false,bookId: book},{$inc:{reviews:-1}})
+        let changeReviewCount= await bookModel.findOneAndUpdate( {isDeleted: false, _id: book},{$inc:{reviews:-1}})
         console.log(changeReviewCount)
         if(changeReviewCount==null) return res.status(404).send({status:false,message:'Data Not Found, Book is deleted'})
        

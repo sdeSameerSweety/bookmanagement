@@ -121,7 +121,7 @@ let getBookByID=async function(req,res){
         let data=req.params.bookId
         if(!data)return res.status(400).send({status:false,msg:""})
         if (!isValidObjectId(data))  return res.status(400).send({ status: false, data: "please provide correct id" })
-        let findBook=await bookModel.findOne({_id:data}).lean()
+        let findBook=await bookModel.findOne({_id:data},{isDeleted: false}).lean()
         if(!findBook)return res.status(404).send({status:false, meg:"No Data Found For this ID"})
         let findReview=await reviewModel.find(({ $and: [{bookId: data},{ isDeleted: false }] }))
         ReviewCount=findReview.length

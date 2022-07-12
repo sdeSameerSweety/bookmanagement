@@ -32,7 +32,7 @@ const validateMobile = function(number) {
 
 const validPassword = function checkPassword(password)
 {
-    var re = /^(?=.\d)(?=.[!@#$%^&])(?=.[a-z])(?=.*[A-Z]).{8,}$/;
+    var re = /^(?=.\d)(?=.[!@#$%^&])(?=.[a-z])(?=.*[A-Z]).{8,15}$/;
     return re.test(password);
 }
 
