@@ -2,12 +2,8 @@ const express=require('express');
 const router=express.Router();
 const userController=require('../controller/userController')
 const bookController=require('../controller/bookController');
-<<<<<<< HEAD
 const reviewController=require('../controller/reviewController');
 const { authenticate, authorise, authoriseToCreateBook } = require('../middleware/commonMW');
-=======
-const { authenticate, authorise, authoriseToCreateBook, authoriseToDeleteReviews } = require('../middleware/commonMW');
->>>>>>> 5e9be6fc2aae9759856a0065bf4ba17ab4e42979
 // const reviewController=require('../controller/reviewController')
 //const reviewController=require('../controller/reviewController')
 
