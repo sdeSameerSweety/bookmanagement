@@ -2,6 +2,7 @@ const express=require('express');
 const router=express.Router();
 const userController=require('../controller/userController')
 const bookController=require('../controller/bookController');
+const reviewController=require('../controller/reviewController');
 const { authenticate, authorise, authoriseToCreateBook } = require('../middleware/commonMW');
 // const reviewController=require('../controller/reviewController')
 //const reviewController=require('../controller/reviewController')
@@ -28,7 +29,7 @@ router.delete('/books/:bookId',authenticate,authorise, bookController.deleteBook
 //......................Get Book By ID....................................//
 router.get('/books/:bookId',bookController.getBookByID)
 router.put('/books/:bookId',bookController.updateBook)
-router.put('/books/:bookId/review',bookController.updateReview)
+router.put('/books/:bookId/review/:reviewId',reviewController.updateReview)
 router.get('/books/:bookId',authenticate,bookController.getBookByID)
 router.put('/books/:bookId',authenticate,authorise,bookController.updateBook)
 
