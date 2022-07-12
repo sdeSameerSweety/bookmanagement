@@ -1,7 +1,6 @@
 const bookModel = require('../models/bookModel')
 const reviewModel = require('../models/reviewModel')
-const mongoose=require('mongoose')
-const { isEmpty, isValidISBN, isVerifyString, isValidDate,isValidObjectId } = require('../middleware/validation')
+const { isEmpty, isValidISBN, isVerifyString, isValidDate,isValidObjectId  } = require('../middleware/validation')
 const userModel = require("../models/userModel")
 
 
@@ -13,7 +12,7 @@ const createBook = async function (req, res) {
         const { title, excerpt, userId, ISBN, category, subcategory, releasedAt } = data
 
         // checking if request body is empty
-        if (Object.keys(data).length == 0) { res.status(400).send({ status: false, msg: "Enter the Books details" }) }
+        if (Object.keys(data).length == 0) { return res.status(400).send({ status: false, msg: "Enter the Books details" }) }
 
         // checking if requireq fields is provided in request body
         if (!title) { return res.status(400).send({ status: false, msg: "title is required" }) }
@@ -22,6 +21,8 @@ const createBook = async function (req, res) {
         if (!ISBN) { return res.status(400).send({ status: false, msg: "ISBN is required" }) }
         if (!category) { return res.status(400).send({ status: false, msg: "category is required" }) }
         if (!subcategory) { return res.status(400).send({ status: false, msg: "subcategory is required" }) }
+        if (!releasedAt) { return res.status(400).send({ status: false, msg: "releasedAt is required" }) }
+
 
         // checking if requireq fields is empty in request body
         if (!isEmpty(title)) return res.status(400).send({ status: false, msg: "Please enter Title" })
@@ -86,7 +87,7 @@ const getBooks = async function (req, res) {
         let booksDetail = await bookModel.find(({ $and: [temp, { isDeleted: false }] }))
       
         if (booksDetail == false)
-            res.status("404").send({ status: false, msg: "data not found" })
+            return res.status("404").send({ status: false, msg: "data not found" })
         else {
             let data = []
             for (let i = 0; i < booksDetail.length; i++) {
@@ -122,7 +123,7 @@ let getBookByID=async function(req,res){
         if (!isValidObjectId(data))  return res.status(400).send({ status: false, data: "please provide correct id" })
         let findBook=await bookModel.findOne({_id:data}).lean()
         if(!findBook)return res.status(404).send({status:false, meg:"No Data Found For this ID"})
-        let findReview=await reviewModel.find({bookId:data})
+        let findReview=await reviewModel.find(({ $and: [{bookId: data},{ isDeleted: false }] }))
         ReviewCount=findReview.length
         findBook.reviews=ReviewCount
         findBook['reviewsData']=findReview

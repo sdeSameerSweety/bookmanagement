@@ -1,8 +1,8 @@
-const jwt = require("jsonwebtoken");
+ const jwt = require("jsonwebtoken");
 const userModel = require("../models/userModel");
 const bookModel= require("../models/bookModel")
 const {isValidObjectId}= require("../middleware/validation")
-const mongoose=require('mongoose')
+
 
 
 const authenticate = async function (req, res, next) {
@@ -28,7 +28,8 @@ const authenticate = async function (req, res, next) {
 
 const authoriseToCreateBook = async function (req, res, next) {
     try {
-
+        let data = req.body;
+        if (Object.keys(data).length == 0) {return res.status(400).send({ status: false, msg: "Enter the Books details" }) }
         let user = req.body.userId
         if (!isValidObjectId(user))  return res.status(400).send({ status: false, data: "please provide correct id" })
         let check = await userModel.findById(user)
@@ -73,6 +74,8 @@ const authorise = async function (req, res, next) {
         return res.status(500).send({ status: false, msg: err.message })
     }
 }
+
+
 
 
 
