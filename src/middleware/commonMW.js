@@ -24,6 +24,7 @@ const authenticate = async function (req, res, next) {
 }
 
 
+ 
 
 
 const authoriseToCreateBook = async function (req, res, next) {
@@ -31,6 +32,7 @@ const authoriseToCreateBook = async function (req, res, next) {
         let data = req.body;
         if (Object.keys(data).length == 0) {return res.status(400).send({ status: false, msg: "Enter the Books details" }) }
         let user = req.body.userId
+        if(!user) return res.status(400).send({status:false,msg:"userId is required"})
         if (!isValidObjectId(user))  return res.status(400).send({ status: false, data: "please provide correct id" })
         let check = await userModel.findById(user)
         if(!check) return res.status(404).send({ status: false, msg: "User Id not found" })
