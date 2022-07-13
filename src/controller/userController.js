@@ -20,10 +20,7 @@ const createUser = async function (req , res) {
         if (!phone) { return res.status(400).send({ status: false, msg: "phone is required" }) }
         if (!password) { return res.status(400).send({ status: false, msg: "password is required" }) }
         if (!email) { return res.status(400).send({ status: false, msg: "email is required" }) }
-        //if (!address) { return res.status(400).send({ status: false, msg: "address is required" }) }
-        //if (!address.city) { return res.status(400).send({ status: false, msg: "city name is required in address" }) }
-        //if (!address.pincode) { return res.status(400).send({ status: false, msg: "pincode is required" }) }
-
+       
 
        
         // validation for title
@@ -56,18 +53,7 @@ const createUser = async function (req , res) {
 
         // validation for passward
         if (!isValid(password)) {return res.status(400).send({ status: false, message: "password must be present" })};
-        console.log(password)
-        if (!validPassword(password)) {return res.status(400).send({status:false, message: "password shoud be 8 to 15 characters which contain at least one numeric digit, one uppercase and one lowercase letter"})}
-        console.log(password)
-        //validation for address
-        if (!isValid(address)) { return res.status(400).send({ status: false, message: "address must be present" }) };
-        if (typeof address.city == 'number') {return res.status(400).send({status:false, message:"provide a valid city name"})}
-        if (isVerifyString(address.city)) {return res.status(400).send({status:false, message:"city name can't contain number"})}
-        if (address.pincode.length != 6) {return res.status(400).send({status:false,message:"Pincode should be of 6 digits"})}
-        if(!/^[1-9][0-9]{5}$/.test(address.pincode)) {return res.status(400).send({status:false,message:"please provide valid pincode"})}
-
-        
-       
+        if (validPassword(password)===false) {return res.status(400).send({status:false, message: "password shoud be 8 to 15 characters which contain at least one numeric digit, one uppercase and one lowercase letter"})}
 
         //saving user data into DB.
         const userData = await userModel.create(data)

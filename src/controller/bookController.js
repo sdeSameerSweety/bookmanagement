@@ -49,6 +49,8 @@ const createBook = async function (req, res) {
 
         if (!isEmpty(subcategory)) { return res.status(400).send({ status: false, msg: "subcategory is required" }) }
         if (isVerifyString(subcategory)) return res.status(400).send({ status: false, message: "subcategory can't contain number" })
+        let findTitle= await bookModel.findOne({title:title})
+        if(findTitle) return res.status(400).send({ status: false, msg: "title already Exist" })
 
         let bookData = await bookModel.create(data);
         res.status(201).send({ status: true, msg: bookData })
@@ -75,7 +77,7 @@ const getBooks = async function (req, res) {
         
         let temp={}
         if(allQuery.userId){
-        if (!isValidObjectId(allQuery.userId))  return res.status(400).send({ status: false, data: "please provide correct id" })
+        if (!isValidObjectId(allQuery.userId))  return res.status(400).send({ status: false, data: "please provide correct Object id for user" })
             temp["userId"]=allQuery.userId
         }
         if(allQuery.category){
@@ -92,6 +94,7 @@ const getBooks = async function (req, res) {
             let data = []
             for (let i = 0; i < booksDetail.length; i++) {
                 let books = {
+                    "_id":booksDetail[i]._id,
                     "title": booksDetail[i].title,
                     "excerpt": booksDetail[i].excerpt,
                     "userId": booksDetail[i].userId,
@@ -119,9 +122,9 @@ const getBooks = async function (req, res) {
 let getBookByID=async function(req,res){
     try {
         let data=req.params.bookId
-        if(!data)return res.status(400).send({status:false,msg:""})
+        if(!data)return res.status(400).send({status:false,msg:"please enter book id"})
         if (!isValidObjectId(data))  return res.status(400).send({ status: false, data: "please provide correct id" })
-        let findBook=await bookModel.findOne({_id:data},{isDeleted: false}).lean()
+        let findBook=await bookModel.findOne({_id:data,isDeleted: false}).lean()
         if(!findBook)return res.status(404).send({status:false, meg:"No Data Found For this ID"})
         let findReview=await reviewModel.find(({ $and: [{bookId: data},{ isDeleted: false }] }))
         ReviewCount=findReview.length
@@ -138,8 +141,9 @@ const deleteBooks = async function (req, res) {
         let book = req.params.bookId
         console.log(book)
         const check = await bookModel.findById(book)
-        if(check.isDeleted==true) return res.status(200).send({ status: false, msg: "data is already deleted" })
-        let DeletedBook = await bookModel.findByIdAndUpdate(  { _id: book }, {$set: { isDeleted: true }})
+        if(check.isDeleted==true) return res.status(404).send({ status: false, msg: "data is already deleted" })
+        let DeletedBook = await bookModel.findByIdAndUpdate(  { _id: book }, {$set: { isDeleted: true,deletedAt:new Date() }})
+
         return res.status(200).send({ status: true, data:"Deleted successfully " })
     }
     catch (err) {

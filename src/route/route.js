@@ -37,6 +37,12 @@ router.post('/books/:bookId/review',reviewController.addReview)
 
 router.delete('/books/:bookId/review/:reviewId', reviewController.deleteReviews)
 
+//for invalid params
+router.post('*',function (req,res){res.status(400).send({msg:"this page does not exist"})})
+router.put('*',function (req,res){res.status(400).send({msg:"this page does not exist"})})
+router.delete('*',function (req,res){res.status(400).send({msg:"this page does not exist"})})
+router.get('*',function (req,res){res.status(400).send({msg:"this page does not exist"})})
+
 module.exports = router;
 
 
