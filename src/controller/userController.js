@@ -30,6 +30,9 @@ const createUser = async function (req , res) {
         if (!isValidString(name)) {return res.status(400).send({status:false, message: "name can't contain symbols"}) }
         if (!isValid(phone)) {return res.status(400).send({ status: false, message: "phone must be present" }) };
         if(!validateMobile(phone)) return res.status(400).send({status:false, message:"phone number is not valid, please provide a valid number"})
+        if(data.address){
+                if(typeof data.address !== "object")return res.status(400).send({status:false,msg:"address must be in the form of object"})}
+              
         
         // checking if phone number is already preasent in the collection
         if(await userModel.findOne({phone:data.phone})){
@@ -45,8 +48,7 @@ const createUser = async function (req , res) {
         // validation for passward
         if (!isValid(password)) {return res.status(400).send({ status: false, message: "password must be present" })};
         if (validPassword(password)===false) {return res.status(400).send({status:false, message: "password shoud be 8 to 15 characters which contain at least one numeric digit, one uppercase and one lowercase letter"})}
-
-        //saving user data into DB.
+  //saving user data into DB.
         const userData = await userModel.create(data)
         return res.status(201).send({ status: true, message: "Successfully saved User data", data: userData })
 

@@ -126,7 +126,7 @@ let getBookByID=async function(req,res){
         if (!isValidObjectId(data))  return res.status(400).send({ status: false, data: "please provide correct id" })
         let findBook=await bookModel.findOne({_id:data,isDeleted: false}).lean()
         if(!findBook)return res.status(404).send({status:false, meg:"No Data Found For this ID"})
-        let findReview=await reviewModel.find(({ $and: [{bookId: data},{ isDeleted: false }] }))
+        let findReview=await reviewModel.find(({ $and: [{bookId: data},{ isDeleted: false }] })).select({isDeleted:0,createdAt:0,updatedAt:0, __v:0})
         ReviewCount=findReview.length
         findBook.reviews=ReviewCount
         findBook['reviewsData']=findReview
@@ -158,26 +158,23 @@ let updateBook=async function (req,res){
     try {
         let data=req.body
         let book=req.params.bookId 
-        const findBook = await bookModel.findOne({_id:book,isDeleted:false}).lean()
+        const findBook = await bookModel.findOne({_id:book,isDeleted:false})
         if(!findBook) return res.status(404).send({ status: false, msg:"No book found"  })
 
         let temp={};
     
         if(data.title){
             trimTitle=data.title.trim()
-            findBook.title=trimTitle
             const checkTitle = await bookModel.findOne({title:trimTitle})
             if(checkTitle)return res.status(400).send({status:false,msg:"this title:"+trimTitle +" "+"already present in database"})
             temp["title"]=trimTitle
         }
         if(data.excerpt){
             trimExcerpt=data.excerpt.trim()
-            findBook.excerpt=data.excerpt
             temp["excerpt"]=data.excerpt
         }
         if(data.ISBN){
             trimISBN=data.ISBN.trim()
-            findBook.ISBN=trimISBN
            if( !isValidISBN(trimISBN))return res.status(400).send({status:false,msg:" Enter valid ISBN "})
             const checkISBN = await bookModel.findOne({ISBN:trimISBN})
             if(checkISBN)return res.status(400).send({status:false,msg:"this ISBN:"+trimISBN +" "+"already present in database"})
@@ -186,7 +183,6 @@ let updateBook=async function (req,res){
          if(data.releasedAt){
             trimReleasedAt=data.releasedAt.trim()
            if(! isValidDate(trimReleasedAt))return res.status(400).send({status:false,msg:"Enter valid date (YYYY-MM-DD) "})
-            findBook.releasedAt=trimReleasedAt
             temp["releasedAt"]=trimReleasedAt
          }
 

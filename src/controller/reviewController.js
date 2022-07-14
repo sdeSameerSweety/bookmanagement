@@ -9,9 +9,10 @@ const addReview = async function (req, res) {
          let reviewedBy= requestReviewBody.reviewedBy;
         let rating= requestReviewBody.rating;
         let review= requestReviewBody.review;
+        console.log(requestReviewBody)
 
         if (Object.keys(requestReviewBody).length == 0) { res.status(400).send({ status: false, msg: "Enter the Books details" }) }
-            
+        if(!validator.isValidObjectId(bookId)){return res.status(400).send({ status: false, message: "Invalid bookId." })}
         const findBookData = await bookModel.findOne({_id :bookId,isDeleted:false})
               if(!findBookData) return res.status(404).send({status:false,message:'No Book Data  Found '}) 
         
@@ -24,8 +25,6 @@ const addReview = async function (req, res) {
         if (!Object.keys(requestReviewBody).includes("reviewedBy")) {
             requestReviewBody["reviewedBy"]= "Guest"
         }
-        
-
         // if (!reviewedBy) { return res.status(400).send({ status: false, msg: "reviewedBy field is required" }) }
         if (!rating) { return res.status(400).send({ status: false, msg: "rating field is required" }) }
         if (!review) { return res.status(400).send({ status: false, msg: "review is required" }) }
@@ -37,19 +36,20 @@ const addReview = async function (req, res) {
         if (!validator.isEmpty(rating)) {return res.status(400).send({ status: false, message: " please provide Rating" })}
 
         //setting rating limit between 1-5.
-        if (!(rating >= 1 && rating <= 5)) {
+        if (!(rating >= 1 && rating <= 5  )) {
             return res.status(400).send({ status: false, message: "Rating must be in between 1 to 5." })
         }
 
         const searchBook = await bookModel.findById({ _id: bookId,isDeleted:false})
         if (!searchBook) { return res.status(404).send({ status: false, message: `Book does not exist by this id ${bookId}.` })}
+        
        
      //extracted Book id 
-        requestReviewBody.bookId = searchBook._id;
+        requestReviewBody["bookId"] = findBookData._id;
         requestReviewBody.reviewedAt = new Date();
 
         const saveReview = await reviewModel.create(requestReviewBody)
-          let BookDetails=  await bookModel.findOneAndUpdate({ _id: bookId }, {$set:{reviews:searchBook.reviews+1 }},{new:true}).lean()
+          let BookDetails=  await bookModel.findOneAndUpdate({ _id:  req.params.bookId }, {$set:{reviews:findBookData.reviews+1 }},{new:true}).lean()
         
        
         const response = await reviewModel.findOne({ _id: saveReview._id }).select({
@@ -59,7 +59,7 @@ const addReview = async function (req, res) {
             isDeleted: 0
         })
         BookDetails["reviewsData"]=response
-        return res.status(201).send({ status: true, message: `Review added successfully for ${searchBook.title}`, data: BookDetails })
+        return res.status(201).send({ status: true, message: `Review added successfully for ${findBookData.title}`, data: BookDetails })
 
     } catch (err) {
         return res.status(500).send({ status: false, Error: err.message })
