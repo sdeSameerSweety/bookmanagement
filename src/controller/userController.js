@@ -7,8 +7,6 @@ const{isValidEmail,isValid,isEmpty,isVerifyString,validateMobile,validPassword,i
 const createUser = async function (req , res) {
     try {
         let data = req.body
-        
-        // destructuring the request body
         const {title,name,phone,email,password,address} = data
 
         // checking if request body is empty
@@ -21,23 +19,16 @@ const createUser = async function (req , res) {
         if (!password) { return res.status(400).send({ status: false, msg: "password is required" }) }
         if (!email) { return res.status(400).send({ status: false, msg: "email is required" }) }
        
-
-       
         // validation for title
         if (!isValid(title)) {return res.status(400).send({ status: false, message: "Title must be present" })};
         const isValidTitle = function(title) {return ['Mr', 'Mrs', 'Miss'].indexOf(title) !== -1}
         if (!isValidTitle(title)) {return res.status(400).send({ status: false, message: `Title should be among Mr, Mrs or Miss` }) }
-
-        // validation for name
         if (!isValid(name)) { return res.status(400).send({ status: false, message: "name must be present" })};
         if (!isEmpty(name)) { return res.status(400).send({status:false, message:"please provide a valid name"})}
         if (typeof name == 'number'){return res.status(400).send({status:false, message: "provide a valid name"})}
         if (isVerifyString(name)) {return res.status(400).send({status:false, message: "name can't contain number"}) } 
         if (!isValidString(name)) {return res.status(400).send({status:false, message: "name can't contain symbols"}) }
-
-        // validation for Phone number
         if (!isValid(phone)) {return res.status(400).send({ status: false, message: "phone must be present" }) };
-        //validation for mobile number length and unique number
         if(!validateMobile(phone)) return res.status(400).send({status:false, message:"phone number is not valid, please provide a valid number"})
         
         // checking if phone number is already preasent in the collection

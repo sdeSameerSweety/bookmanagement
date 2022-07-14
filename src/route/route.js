@@ -10,21 +10,13 @@ const { authenticate, authorise, authoriseToCreateBook } = require('../middlewar
 
 //......................Create User....................................//
 router.post('/register',userController.createUser)
-
-
-
 //......................Login User....................................//
 
 router.post('/login',userController.loginUser)
 
 router.post('/books',authenticate,authoriseToCreateBook, bookController.createBook)
 router.get('/books',authenticate, bookController.getBooks)
-
-
-
-
 router.delete('/books/:bookId',authenticate,authorise, bookController.deleteBooks)
-
 
 //......................Get Book By ID....................................//
 router.put('/books/:bookId/review/:reviewId',reviewController.updateReview)

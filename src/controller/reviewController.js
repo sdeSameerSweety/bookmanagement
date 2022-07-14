@@ -41,7 +41,7 @@ const addReview = async function (req, res) {
             return res.status(400).send({ status: false, message: "Rating must be in between 1 to 5." })
         }
 
-        const searchBook = await bookModel.findById({ _id: bookId,idDeleted:false})
+        const searchBook = await bookModel.findById({ _id: bookId,isDeleted:false})
         if (!searchBook) { return res.status(404).send({ status: false, message: `Book does not exist by this id ${bookId}.` })}
        
      //extracted Book id 
