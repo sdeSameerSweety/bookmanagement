@@ -2,12 +2,44 @@ const bookModel = require('../models/bookModel')
 const reviewModel = require('../models/reviewModel')
 const { isEmpty, isValidISBN, isVerifyString, isValidDate,isValidObjectId  } = require('../middleware/validation')
 const userModel = require("../models/userModel")
+const aws= require("aws-sdk")
+
+
+// let uploadFile= async ( file) =>{
+//     return new Promise( function(resolve, reject) {
+//      // this function will upload file to aws and return the link
+//      let s3= new aws.S3({apiVersion: '2006-03-01'}); // we will be using the s3 service of aws
+ 
+//      var uploadParams= {
+//          ACL: "public-read",
+//          Bucket: "classroom-training-bucket",  //HERE
+//          Key: "bookCover/" + file.originalname, //HERE 
+//          Body: file.buffer
+//      }
+ 
+ 
+//      s3.upload( uploadParams, function (err, data ){
+//          if(err) {
+//              return reject({"error": err})
+//          }
+//          console.log(data)
+//          console.log("file uploaded succesfully")
+//          return resolve(data.Location)
+//      })
+ 
+//      // let data= await s3.upload( uploadParams)
+//      // if( data) return data.Location
+//      // else return "there is an error"
+ 
+//     })
+//  }
+
 
 
 const createBook = async function (req, res) {
-
     try {
         let data = req.body;
+        
         // destructuring the request body
         const { title, excerpt, userId, ISBN, category, subcategory, releasedAt } = data
 
@@ -51,9 +83,19 @@ const createBook = async function (req, res) {
         if (isVerifyString(subcategory)) return res.status(400).send({ status: false, message: "subcategory can't contain number" })
         let findTitle= await bookModel.findOne({title:title})
         if(findTitle) return res.status(400).send({ status: false, msg: "title already Exist" })
+        // let files= req.files
+        // if(files && files.length>0){
+            //upload to s3 and get the uploaded link
+            // res.send the link back to frontend/postman
+           // let uploadedFileURL= await uploadFile( files[0] )
+      //      data["bookCover"]=uploadedFileURL
+        // }
+        // else{
+        //   return  res.status(400).send({ msg: "No file found" })
+        // }
 
         let bookData = await bookModel.create(data);
-        res.status(201).send({ status: true, msg: bookData })
+  return      res.status(201).send({ status: true, msg: bookData })
 
     } catch (error) {
         console.log("Server Error", error.message)
@@ -86,31 +128,13 @@ const getBooks = async function (req, res) {
         if(allQuery.subcategory){
             temp["subcategory"]=allQuery.subcategory.toLowerCase()
         }
-        let booksDetail = await bookModel.find(({ $and: [temp, { isDeleted: false }] }))
+        let booksDetail = await bookModel.find(({ $and: [temp, { isDeleted: false }] })).sort({title:1})
       
         if (booksDetail == false)
-            return res.status("404").send({ status: false, msg: "data not found" })
-        else {
-            let data = []
-            for (let i = 0; i < booksDetail.length; i++) {
-                let books = {
-                    "_id":booksDetail[i]._id,
-                    "title": booksDetail[i].title,
-                    "excerpt": booksDetail[i].excerpt,
-                    "userId": booksDetail[i].userId,
-                    "category": booksDetail[i].category,
-                    "releasedAt": booksDetail[i].releasedAt,
-                    "reviews": booksDetail[i].reviews,
-                }
-                data.push(books)
-            }
-            data.sort(function (a, b) {
-                if (a.title.toLowerCase() < b.title.toLowerCase()) return -1;
-                if (a.title.toLowerCase() > b.title.toLowerCase()) return 1
-                return 0;
-            })
-            res.status(200).send({ status: true, message: "Books List", data: data })
-        }
+            {return res.status(404).send({ status: false, msg: "data not found" })}
+        
+            res.status(200).send({ status: true, message: "Books List", data: booksDetail })
+        
     }
     catch (err) {
         console.log(err)
@@ -127,8 +151,7 @@ let getBookByID=async function(req,res){
         let findBook=await bookModel.findOne({_id:data,isDeleted: false}).lean()
         if(!findBook)return res.status(404).send({status:false, meg:"No Data Found For this ID"})
         let findReview=await reviewModel.find(({ $and: [{bookId: data},{ isDeleted: false }] })).select({isDeleted:0,createdAt:0,updatedAt:0, __v:0})
-        ReviewCount=findReview.length
-        findBook.reviews=ReviewCount
+       
         findBook['reviewsData']=findReview
         return res.status(200).send({status:true,message:'Books list',Data:findBook})
     } catch (error) {
