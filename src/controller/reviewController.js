@@ -111,7 +111,7 @@ let updateReview = async function (req, res) {
 
         let updatedReview = await reviewModel.findOneAndUpdate({ _id:reviewId, isDeleted: false }, { $set: data }, { new: true }).select({isDeleted:0,updatedAt:0,createdAt:0})
         if (!updatedReview) return res.status(404).send({ status: false, msg: "Review Data Not found" })
-        
+         
         findBook["reviewsData"]=updatedReview
        return res.status(200).send({ status: true, msg:"updated review document", data: findBook })
 
@@ -125,7 +125,7 @@ let updateReview = async function (req, res) {
 const deleteReviews = async function (req, res) {
     try {
         let book = req.params.bookId.trim()
-        let review = req.params.reviewId.trim()
+        let review = req.params.reviewId.trim().toString()
      
      if(!validator.isValidObjectId(book)){return res.status(400).send({ status: false, message: "Invalid bookId." })}
       if(!validator.isValidObjectId(review)){return res.status(400).send({ status: false, message: "Invalid reviewId." })}
@@ -133,11 +133,11 @@ const deleteReviews = async function (req, res) {
         const findReviewData = await reviewModel.findOne({_id : review,bookId: book,isDeleted:false})
         if(!findReviewData) return res.status(404).send({status:false,message:'No review Data Found'})
        
-        let changeReviewCount= await bookModel.findOneAndUpdate( {isDeleted: false,_id: book})
-        if(changeReviewCount==null) return res.status(404).send({status:false,message:'Data Not Found, Book is deleted'})
-        changeReviewCount.reviews= changeReviewCount.reviews===0 ?0 :changeReviewCount.reviews -1
-            await changeReviewCount.save()
-        let DeletedReview = await reviewModel.findByIdAndUpdate(  { _id: review }, {$set: { isDeleted: true }})
+        let changeReviewCount= await bookModel.findOne( {isDeleted: false,_id: book}).lean()
+      if(changeReviewCount==null) return res.status(404).send({status:false,message:'Data Not Found, Book is deleted'})
+       changeReviewCount.reviews= changeReviewCount.reviews===0 ?0 :changeReviewCount.reviews -1
+           let update=await bookModel.findOneAndUpdate({_id:book},{$set:{reviews:changeReviewCount.reviews}})
+        let DeletedReview = await reviewModel.findByIdAndUpdate(  { _id:review }, {$set:{ isDeleted: true }})
         return res.status(200).send({status:true,Data:"review Deleted successfully"})
      
     }

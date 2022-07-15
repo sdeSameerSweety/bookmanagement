@@ -6,7 +6,7 @@ let reviewSchema= new mongoose.Schema({
         type:ObjectId,
         required:true,
         ref:'Book',
-        trim:true   
+        trim:true  
     },
     reviewedBy:{
         type:String,

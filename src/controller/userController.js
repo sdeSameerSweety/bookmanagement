@@ -33,7 +33,7 @@ const createUser = async function (req , res) {
         if(data.address){
                 if(typeof data.address !== "object")return res.status(400).send({status:false,msg:"address must be in the form of object"})}
               
-        
+       
         // checking if phone number is already preasent in the collection
         if(await userModel.findOne({phone:data.phone})){
             return res.status(400).send({status:false, message:"PhoneNumber already exists. Please give another one"})
@@ -52,7 +52,7 @@ const createUser = async function (req , res) {
         const userData = await userModel.create(data)
         return res.status(201).send({ status: true, message: "Successfully saved User data", data: userData })
 
-    }
+    } 
     catch(err) {
         console.log(err)
         return res.status(500).send({ status: false, message: "Something went wrong", Error: err.message})}

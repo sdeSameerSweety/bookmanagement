@@ -2,44 +2,15 @@ const bookModel = require('../models/bookModel')
 const reviewModel = require('../models/reviewModel')
 const { isEmpty, isValidISBN, isVerifyString, isValidDate,isValidObjectId  } = require('../middleware/validation')
 const userModel = require("../models/userModel")
-const aws= require("aws-sdk")
+const {uploadFile}=require("../route/aws")
 
-
-// let uploadFile= async ( file) =>{
-//     return new Promise( function(resolve, reject) {
-//      // this function will upload file to aws and return the link
-//      let s3= new aws.S3({apiVersion: '2006-03-01'}); // we will be using the s3 service of aws
- 
-//      var uploadParams= {
-//          ACL: "public-read",
-//          Bucket: "classroom-training-bucket",  //HERE
-//          Key: "bookCover/" + file.originalname, //HERE 
-//          Body: file.buffer
-//      }
- 
- 
-//      s3.upload( uploadParams, function (err, data ){
-//          if(err) {
-//              return reject({"error": err})
-//          }
-//          console.log(data)
-//          console.log("file uploaded succesfully")
-//          return resolve(data.Location)
-//      })
- 
-//      // let data= await s3.upload( uploadParams)
-//      // if( data) return data.Location
-//      // else return "there is an error"
- 
-//     })
-//  }
 
 
 
 const createBook = async function (req, res) {
     try {
         let data = req.body;
-        
+        let files= req.files
         // destructuring the request body
         const { title, excerpt, userId, ISBN, category, subcategory, releasedAt } = data
 
@@ -64,7 +35,7 @@ const createBook = async function (req, res) {
         let userID = data.userId
         let checkUserId = await userModel.findOne({ userId: userID })
         if (!checkUserId)
-            return res.status(400).send({ status: false, msg: "userId don't Exist" })
+            return res.status(404).send({ status: false, msg: "userId don't Exist" })
 
         let ISBNnumber = data.ISBN;
         let checkISBN = await bookModel.findOne({ ISBN: ISBNnumber })
@@ -83,17 +54,14 @@ const createBook = async function (req, res) {
         if (isVerifyString(subcategory)) return res.status(400).send({ status: false, message: "subcategory can't contain number" })
         let findTitle= await bookModel.findOne({title:title})
         if(findTitle) return res.status(400).send({ status: false, msg: "title already Exist" })
-        // let files= req.files
-        // if(files && files.length>0){
-            //upload to s3 and get the uploaded link
-            // res.send the link back to frontend/postman
-           // let uploadedFileURL= await uploadFile( files[0] )
-      //      data["bookCover"]=uploadedFileURL
-        // }
-        // else{
-        //   return  res.status(400).send({ msg: "No file found" })
-        // }
-
+      
+        if(files && files.length>0){
+            let uploadedFileURL= await uploadFile( files[0] )
+            data["bookCover"]=uploadedFileURL
+        }
+        else{
+            res.status(400).send({ msg: "No file found" })
+        }
         let bookData = await bookModel.create(data);
   return      res.status(201).send({ status: true, msg: bookData })
 
@@ -179,7 +147,7 @@ const deleteBooks = async function (req, res) {
 
 let updateBook=async function (req,res){
     try {
-        let data=req.body
+        let data=req.body 
         let book=req.params.bookId 
         const findBook = await bookModel.findOne({_id:book,isDeleted:false})
         if(!findBook) return res.status(404).send({ status: false, msg:"No book found"  })

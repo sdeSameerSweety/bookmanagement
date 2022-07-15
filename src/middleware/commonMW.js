@@ -41,8 +41,7 @@ const authoriseToCreateBook = async function (req, res, next) {
         let decodedToken = jwt.verify(token, "Book Management Project@#$%, team No.= 62")
         console.log(check._id.toString())
         if (decodedToken.id !== check._id.toString()) return res.status(401).send({ status: false, msg: "User logged is not allowed to create a book" })
-        
-    
+            
         next()
        
     }
