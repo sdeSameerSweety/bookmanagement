@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/isamir909/Project-3-BookManagement.git"
+    "url": "https://github.com/sdeSameerSweety/bookmanagement.git"
   },
-  "author": "",
+  "author": "Aditya Kumar",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/isamir909/Project-3-BookManagement/issues"
+    "url": "https://github.com/sdeSameerSweety/bookmanagement/issues"
   },
-  "homepage": "https://github.com/isamir909/Project-3-BookManagement#readme",
+  "homepage": "https://github.com/sdeSameerSweety/bookmanagement#readme",
   "dependencies": {
     "aws-sdk": "^2.1174.0",
     "body-parser": "^1.20.0",
